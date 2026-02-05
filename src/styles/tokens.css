@@ -1,0 +1,32 @@
+:root {
+  /* Backgrounds */
+  --color-bg: #050b10;     /* 전체 배경 더 딥하게 */
+  --color-bg-2: #07131a;
+
+  /* Text */
+  --color-text: rgba(255, 255, 255, 0.88);
+  --color-text-dim: rgba(255, 255, 255, 0.58);
+
+  /* Lines */
+  --color-border: rgba(255, 255, 255, 0.10); /* 스크린샷처럼 얇고 은은 */
+
+  /* Accent (Research/News 타이틀) */
+  --color-accent: #d7bf73;
+
+  /* Card */
+  --color-card-bg: rgba(0, 0, 0, 0.28); /* 지금(0.35)보다 살짝 가볍게 */
+
+  /* Fonts */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
+
+  /* 스크린샷은 세리프 타이틀이 “고급스럽고 굵기 변화”가 있음
+     가능하면 Playfair Display / Cormorant 같은 걸로 교체 권장 */
+  --font-serif: ui-serif, Georgia, "Times New Roman", serif;
+
+  /* Layout */
+  --container: 1120px;
+
+  /* Radius */
+  --radius-1: 10px;
+  --radius-2: 16px;
+}
