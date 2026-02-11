@@ -25,3 +25,18 @@ body {
     color: inherit;
   }
 }
+
+.research-tabs a {
+  color: rgba(0,0,0,0.88) !important;
+}
+
+.research-tabs a:hover,
+.research-tabs a:active,
+.research-tabs a:visited {
+  color: rgba(0,0,0,0.88) !important;
+}
+
+.research-scope,
+.research-scope * {
+  color: rgba(0,0,0,0.88) !important;
+}
