@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import logo from "../../assets/icons/logo.png";
+import { Link } from "react-router-dom";
 
 const IconButton = ({ label, children, onClick, ariaExpanded }) => (
   <button
@@ -15,58 +16,62 @@ const IconButton = ({ label, children, onClick, ariaExpanded }) => (
 );
 
 function MenuOverlay({ open, onClose }) {
-  // ESC 닫기
   useEffect(() => {
     if (!open) return;
+
     const onKeyDown = (e) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+
+    // ✅ 열려있는 동안 뒤 스크롤 막기
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = prev;
+    };
   }, [open, onClose]);
 
+  // ✅ 열릴 때만 렌더 (이게 핵심: 꼬임/덮어쓰기 제거)
+  if (!open) return null;
+
   return (
-    <div
-      className={[
-        // ✅ Header(1000)보다 위로 올려야 페이지 전체를 덮고 blur가 "뒤"에 걸림
-        "fixed inset-0 z-[5000]",
-        "transition-opacity duration-300",
-        open ? "opacity-100" : "opacity-0 pointer-events-none",
-      ].join(" ")}
-      aria-hidden={!open}
-    >
-      {/* ✅ 배경: 메인페이지 요소들을 blur+dim (메뉴는 제외) */}
-      <div
-        className="absolute inset-0 z-0"
+    <div className="fixed inset-0 z-[99999]">
+      {/* ✅ 1) 전체 덮는 어두운 막 + 블러 */}
+      <button
+        type="button"
+        aria-label="Close menu"
         onClick={onClose}
+        className="absolute inset-0"
         style={{
-          background: "rgba(0,0,0,0.50)",
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)",
+          background: "rgba(0,0,0,0.72)", // ✅ 뒤 화면 어둡게 (피그마 느낌)
+          backdropFilter: "blur(100px)",
+          WebkitBackdropFilter: "blur(100px)",
         }}
       />
 
-      {/* inner shadow(비네트) - 배경 위에만 */}
+      {/* ✅ 2) 가장자리 비네트(오른쪽 스샷처럼 가장자리 더 어둡게) */}
       <div
-        className="pointer-events-none absolute inset-0 z-[1]"
+        className="pointer-events-none absolute inset-0"
         style={{
           background: `
             radial-gradient(
-              ellipse 80% 70% at 50% 50%,
-              rgba(0,0,0,0) 40%,
-              rgba(0,0,0,0.45) 75%,
+              ellipse 80% 70% at 50% 20%,
+              rgba(0,0,0,0) 0%,
+              rgba(0,0,0,0.35) 55%,
               rgba(0,0,0,0.85) 100%
             )
           `,
         }}
       />
 
-      {/* ✅ 메뉴 컨텐츠: blur 영향 X (배경보다 위) */}
+      {/* ✅ 3) 메뉴 컨텐츠 */}
       <div className="relative z-10 w-full px-6">
-        <div className="mx-auto max-w-[1200px] pt-[160px] pb-16">
+        <div className="mx-auto max-w-[1200px] pt-[120px] pb-16">
           <nav className="flex justify-center">
             <div className="grid grid-cols-5 gap-24">
-              {/* Home */}
               <div className="flex flex-col items-center">
                 <div
                   className="mb-6 text-white text-center"
@@ -81,7 +86,6 @@ function MenuOverlay({ open, onClose }) {
                 </div>
               </div>
 
-              {/* Research */}
               <div className="flex flex-col items-center">
                 <div
                   className="mb-6 text-white text-center"
@@ -105,24 +109,35 @@ function MenuOverlay({ open, onClose }) {
                   }}
                 >
                   <li>
-                    <a className="hover:text-white" href="#">
+                    <Link
+                      to="/research"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
                       Research topics
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a className="hover:text-white" href="#">
+                    <Link
+                      to="/research/achievements"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
                       Achievements
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a className="hover:text-white" href="#">
+                    <Link
+                      to="/research/projects"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
                       Projects
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
 
-              {/* Members */}
               <div className="flex flex-col items-center">
                 <div
                   className="mb-6 text-white text-center"
@@ -145,25 +160,12 @@ function MenuOverlay({ open, onClose }) {
                     lineHeight: "30px",
                   }}
                 >
-                  <li>
-                    <a className="hover:text-white" href="#">
-                      Professor
-                    </a>
-                  </li>
-                  <li>
-                    <a className="hover:text-white" href="#">
-                      Students
-                    </a>
-                  </li>
-                  <li>
-                    <a className="hover:text-white" href="#">
-                      Alumni
-                    </a>
-                  </li>
+                  <li><a className="hover:text-white" href="#">Professor</a></li>
+                  <li><a className="hover:text-white" href="#">Students</a></li>
+                  <li><a className="hover:text-white" href="#">Alumni</a></li>
                 </ul>
               </div>
 
-              {/* About us */}
               <div className="flex flex-col items-center">
                 <div
                   className="mb-6 text-white text-center"
@@ -186,20 +188,11 @@ function MenuOverlay({ open, onClose }) {
                     lineHeight: "30px",
                   }}
                 >
-                  <li>
-                    <a className="hover:text-white" href="#">
-                      Facilities
-                    </a>
-                  </li>
-                  <li>
-                    <a className="hover:text-white" href="#">
-                      Vision &amp; Mission
-                    </a>
-                  </li>
+                  <li><a className="hover:text-white" href="#">Facilities</a></li>
+                  <li><a className="hover:text-white" href="#">Vision &amp; Mission</a></li>
                 </ul>
               </div>
 
-              {/* Community */}
               <div className="flex flex-col items-center">
                 <div
                   className="mb-6 text-white text-center"
@@ -222,26 +215,10 @@ function MenuOverlay({ open, onClose }) {
                     lineHeight: "30px",
                   }}
                 >
-                  <li>
-                    <a className="hover:text-white" href="#">
-                      News
-                    </a>
-                  </li>
-                  <li>
-                    <a className="hover:text-white" href="#">
-                      Gallery
-                    </a>
-                  </li>
-                  <li>
-                    <a className="hover:text-white" href="#">
-                      Contact us
-                    </a>
-                  </li>
-                  <li>
-                    <a className="hover:text-white" href="#">
-                      Q&amp;A
-                    </a>
-                  </li>
+                  <li><a className="hover:text-white" href="#">News</a></li>
+                  <li><a className="hover:text-white" href="#">Gallery</a></li>
+                  <li><a className="hover:text-white" href="#">Contact us</a></li>
+                  <li><a className="hover:text-white" href="#">Q&amp;A</a></li>
                 </ul>
               </div>
             </div>
@@ -252,27 +229,28 @@ function MenuOverlay({ open, onClose }) {
   );
 }
 
-export default function Header() {
+export default function Header({ theme = "dark" }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <>
-      <header className="absolute top-0 left-0 right-0 z-[1000] w-full">
-        {/* 상단 어두운 그라데이션(사진처럼) */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[96px] bg-gradient-to-b from-black/70 via-black/30 to-transparent" />
+      {/* ✅ 핵심: 헤더 높이를 96으로 고정 + overflow-hidden으로 그라데이션 삐져나오는 현상 차단 */}
+      <header
+        className="fixed top-0 left-0 right-0 z-[1000] w-full h-[96px] !bg-black overflow-hidden text-white"
+        style={{ backgroundColor: "#000" }} // ✅ 2중 안전장치(혹시 모를 덮어쓰기 방지)
+      >
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-transparent" />
 
-        {/* ✅ 화면 좌우 꽉 차는 래퍼 */}
         <div className="relative w-full px-6">
           <div className="h-[72px] flex items-center justify-between">
-            {/* Left: 로고 + 텍스트 */}
-            <a href="/" className="flex items-center gap-3 text-white">
+            {/* Left */}
+            <Link to="/" className="flex items-center gap-3 text-white">
               <img
                 src={logo}
                 alt="CMS LAB"
                 className="w-[44px] h-[48px] object-contain"
                 draggable="false"
               />
-
               <div
                 style={{
                   fontFamily: "Unna, serif",
@@ -286,111 +264,40 @@ export default function Header() {
                 <div>CYBER MARINE</div>
                 <div>SYSTEM LAB</div>
               </div>
-            </a>
+            </Link>
 
-            {/* Right: 아이콘 3개 */}
+            {/* Right */}
             <div className="flex items-center gap-3">
               <IconButton label="Language">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="opacity-95"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                  />
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="opacity-95" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="1.8" />
                   <path d="M2 12H22" stroke="currentColor" strokeWidth="1.8" />
-                  <path
-                    d="M12 2C14.7614 4.66667 16 8 16 12C16 16 14.7614 19.3333 12 22C9.23858 19.3333 8 16 8 12C8 8 9.23858 4.66667 12 2Z"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                  />
+                  <path d="M12 2C14.7614 4.66667 16 8 16 12C16 16 14.7614 19.3333 12 22C9.23858 19.3333 8 16 8 12C8 8 9.23858 4.66667 12 2Z" stroke="currentColor" strokeWidth="1.8" />
                 </svg>
               </IconButton>
 
               <IconButton label="Search">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="opacity-95"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                  />
-                  <path
-                    d="M21 21L16.65 16.65"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                  />
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="opacity-95" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="currentColor" strokeWidth="1.8" />
+                  <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                 </svg>
               </IconButton>
 
-              {/* Menu 버튼: open 시 X 아이콘 */}
               <IconButton
                 label={menuOpen ? "Close menu" : "Menu"}
                 onClick={() => setMenuOpen((v) => !v)}
                 ariaExpanded={menuOpen}
               >
                 {menuOpen ? (
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    className="opacity-95"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M6 6L18 18"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M18 6L6 18"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="opacity-95" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 6L18 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    <path d="M18 6L6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                   </svg>
                 ) : (
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    className="opacity-95"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M4 7H20"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M4 12H20"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M4 17H20"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="opacity-95" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 7H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    <path d="M4 12H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    <path d="M4 17H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                   </svg>
                 )}
               </IconButton>
@@ -399,7 +306,11 @@ export default function Header() {
         </div>
       </header>
 
-      <MenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MenuOverlay
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        theme={theme}
+      />
     </>
   );
 }
