@@ -160,9 +160,33 @@ function MenuOverlay({ open, onClose }) {
                     lineHeight: "30px",
                   }}
                 >
-                  <li><a className="hover:text-white" href="#">Professor</a></li>
-                  <li><a className="hover:text-white" href="#">Students</a></li>
-                  <li><a className="hover:text-white" href="#">Alumni</a></li>
+                  <li>
+                    <Link
+                      to="/members/professor"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
+                      Professor
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/members/students"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
+                      Students
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/members/alumni"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
+                      Alumni
+                    </Link>
+                  </li>
                 </ul>
               </div>
 
@@ -188,8 +212,16 @@ function MenuOverlay({ open, onClose }) {
                     lineHeight: "30px",
                   }}
                 >
-                  <li><a className="hover:text-white" href="#">Facilities</a></li>
-                  <li><a className="hover:text-white" href="#">Vision &amp; Mission</a></li>
+                  <li>
+                    <a className="hover:text-white" href="#">
+                      Facilities
+                    </a>
+                  </li>
+                  <li>
+                    <a className="hover:text-white" href="#">
+                      Vision &amp; Mission
+                    </a>
+                  </li>
                 </ul>
               </div>
 
@@ -215,10 +247,26 @@ function MenuOverlay({ open, onClose }) {
                     lineHeight: "30px",
                   }}
                 >
-                  <li><a className="hover:text-white" href="#">News</a></li>
-                  <li><a className="hover:text-white" href="#">Gallery</a></li>
-                  <li><a className="hover:text-white" href="#">Contact us</a></li>
-                  <li><a className="hover:text-white" href="#">Q&amp;A</a></li>
+                  <li>
+                    <a className="hover:text-white" href="#">
+                      News
+                    </a>
+                  </li>
+                  <li>
+                    <a className="hover:text-white" href="#">
+                      Gallery
+                    </a>
+                  </li>
+                  <li>
+                    <a className="hover:text-white" href="#">
+                      Contact us
+                    </a>
+                  </li>
+                  <li>
+                    <a className="hover:text-white" href="#">
+                      Q&amp;A
+                    </a>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -269,17 +317,48 @@ export default function Header({ theme = "dark" }) {
             {/* Right */}
             <div className="flex items-center gap-3">
               <IconButton label="Language">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="opacity-95" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="1.8" />
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="opacity-95"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                  />
                   <path d="M2 12H22" stroke="currentColor" strokeWidth="1.8" />
-                  <path d="M12 2C14.7614 4.66667 16 8 16 12C16 16 14.7614 19.3333 12 22C9.23858 19.3333 8 16 8 12C8 8 9.23858 4.66667 12 2Z" stroke="currentColor" strokeWidth="1.8" />
+                  <path
+                    d="M12 2C14.7614 4.66667 16 8 16 12C16 16 14.7614 19.3333 12 22C9.23858 19.3333 8 16 8 12C8 8 9.23858 4.66667 12 2Z"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                  />
                 </svg>
               </IconButton>
 
               <IconButton label="Search">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="opacity-95" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="currentColor" strokeWidth="1.8" />
-                  <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="opacity-95"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                  />
+                  <path
+                    d="M21 21L16.65 16.65"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
                 </svg>
               </IconButton>
 
@@ -289,15 +368,54 @@ export default function Header({ theme = "dark" }) {
                 ariaExpanded={menuOpen}
               >
                 {menuOpen ? (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="opacity-95" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6 6L18 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                    <path d="M18 6L6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className="opacity-95"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M6 6L18 18"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M18 6L6 18"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
                   </svg>
                 ) : (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="opacity-95" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 7H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                    <path d="M4 12H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                    <path d="M4 17H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className="opacity-95"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M4 7H20"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M4 12H20"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M4 17H20"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
                   </svg>
                 )}
               </IconButton>
