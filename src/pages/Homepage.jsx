@@ -5,7 +5,11 @@ import ResearchSection from "../components/home/ResearchSection";
 import NewsSection from "../components/home/NewsSection";
 import PartnersSection from "../components/home/PartnersSection";
 
+
 export default function HomePage() {
+  // useEffect(() => {
+  //   document.documentElement.removeAttribute("data-theme");
+  // }, []);
   return (
     <div className="min-h-screen bg-bg">
       <Header />

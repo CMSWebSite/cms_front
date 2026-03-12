@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import logo from "../../assets/icons/logo.png";
+import { Link } from "react-router-dom";
 
 const IconButton = ({ label, children, onClick, ariaExpanded }) => (
   <button
@@ -15,58 +16,62 @@ const IconButton = ({ label, children, onClick, ariaExpanded }) => (
 );
 
 function MenuOverlay({ open, onClose }) {
-  // ESC 닫기
   useEffect(() => {
     if (!open) return;
+
     const onKeyDown = (e) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+
+    // ✅ 열려있는 동안 뒤 스크롤 막기
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = prev;
+    };
   }, [open, onClose]);
 
+  // ✅ 열릴 때만 렌더 (이게 핵심: 꼬임/덮어쓰기 제거)
+  if (!open) return null;
+
   return (
-    <div
-      className={[
-        // ✅ Header(1000)보다 위로 올려야 페이지 전체를 덮고 blur가 "뒤"에 걸림
-        "fixed inset-0 z-[5000]",
-        "transition-opacity duration-300",
-        open ? "opacity-100" : "opacity-0 pointer-events-none",
-      ].join(" ")}
-      aria-hidden={!open}
-    >
-      {/* ✅ 배경: 메인페이지 요소들을 blur+dim (메뉴는 제외) */}
-      <div
-        className="absolute inset-0 z-0"
+    <div className="fixed inset-0 z-[99999]">
+      {/* ✅ 1) 전체 덮는 어두운 막 + 블러 */}
+      <button
+        type="button"
+        aria-label="Close menu"
         onClick={onClose}
+        className="absolute inset-0"
         style={{
-          background: "rgba(0,0,0,0.50)",
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)",
+          background: "rgba(0,0,0,0.72)", // ✅ 뒤 화면 어둡게 (피그마 느낌)
+          backdropFilter: "blur(100px)",
+          WebkitBackdropFilter: "blur(100px)",
         }}
       />
 
-      {/* inner shadow(비네트) - 배경 위에만 */}
+      {/* ✅ 2) 가장자리 비네트(오른쪽 스샷처럼 가장자리 더 어둡게) */}
       <div
-        className="pointer-events-none absolute inset-0 z-[1]"
+        className="pointer-events-none absolute inset-0"
         style={{
           background: `
             radial-gradient(
-              ellipse 80% 70% at 50% 50%,
-              rgba(0,0,0,0) 40%,
-              rgba(0,0,0,0.45) 75%,
+              ellipse 80% 70% at 50% 20%,
+              rgba(0,0,0,0) 0%,
+              rgba(0,0,0,0.35) 55%,
               rgba(0,0,0,0.85) 100%
             )
           `,
         }}
       />
 
-      {/* ✅ 메뉴 컨텐츠: blur 영향 X (배경보다 위) */}
+      {/* ✅ 3) 메뉴 컨텐츠 */}
       <div className="relative z-10 w-full px-6">
-        <div className="mx-auto max-w-[1200px] pt-[160px] pb-16">
+        <div className="mx-auto max-w-[1200px] pt-[120px] pb-16">
           <nav className="flex justify-center">
             <div className="grid grid-cols-5 gap-24">
-              {/* Home */}
               <div className="flex flex-col items-center">
                 <div
                   className="mb-6 text-white text-center"
@@ -81,7 +86,6 @@ function MenuOverlay({ open, onClose }) {
                 </div>
               </div>
 
-              {/* Research */}
               <div className="flex flex-col items-center">
                 <div
                   className="mb-6 text-white text-center"
@@ -105,24 +109,35 @@ function MenuOverlay({ open, onClose }) {
                   }}
                 >
                   <li>
-                    <a className="hover:text-white" href="#">
+                    <Link
+                      to="/research"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
                       Research topics
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a className="hover:text-white" href="#">
+                    <Link
+                      to="/research/achievements"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
                       Achievements
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a className="hover:text-white" href="#">
+                    <Link
+                      to="/research/projects"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
                       Projects
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
 
-              {/* Members */}
               <div className="flex flex-col items-center">
                 <div
                   className="mb-6 text-white text-center"
@@ -146,24 +161,35 @@ function MenuOverlay({ open, onClose }) {
                   }}
                 >
                   <li>
-                    <a className="hover:text-white" href="#">
+                    <Link
+                      to="/members/professor"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
                       Professor
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a className="hover:text-white" href="#">
+                    <Link
+                      to="/members/students"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
                       Students
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a className="hover:text-white" href="#">
+                    <Link
+                      to="/members/alumni"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
                       Alumni
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
 
-              {/* About us */}
               <div className="flex flex-col items-center">
                 <div
                   className="mb-6 text-white text-center"
@@ -199,7 +225,6 @@ function MenuOverlay({ open, onClose }) {
                 </ul>
               </div>
 
-              {/* Community */}
               <div className="flex flex-col items-center">
                 <div
                   className="mb-6 text-white text-center"
@@ -252,27 +277,28 @@ function MenuOverlay({ open, onClose }) {
   );
 }
 
-export default function Header() {
+export default function Header({ theme = "dark" }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <>
-      <header className="absolute top-0 left-0 right-0 z-[1000] w-full">
-        {/* 상단 어두운 그라데이션(사진처럼) */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[96px] bg-gradient-to-b from-black/70 via-black/30 to-transparent" />
+      {/* ✅ 핵심: 헤더 높이를 96으로 고정 + overflow-hidden으로 그라데이션 삐져나오는 현상 차단 */}
+      <header
+        className="fixed top-0 left-0 right-0 z-[1000] w-full h-[96px] !bg-black overflow-hidden text-white"
+        style={{ backgroundColor: "#000" }} // ✅ 2중 안전장치(혹시 모를 덮어쓰기 방지)
+      >
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-transparent" />
 
-        {/* ✅ 화면 좌우 꽉 차는 래퍼 */}
         <div className="relative w-full px-6">
           <div className="h-[72px] flex items-center justify-between">
-            {/* Left: 로고 + 텍스트 */}
-            <a href="/" className="flex items-center gap-3 text-white">
+            {/* Left */}
+            <Link to="/" className="flex items-center gap-3 text-white">
               <img
                 src={logo}
                 alt="CMS LAB"
                 className="w-[44px] h-[48px] object-contain"
                 draggable="false"
               />
-
               <div
                 style={{
                   fontFamily: "Unna, serif",
@@ -286,9 +312,9 @@ export default function Header() {
                 <div>CYBER MARINE</div>
                 <div>SYSTEM LAB</div>
               </div>
-            </a>
+            </Link>
 
-            {/* Right: 아이콘 3개 */}
+            {/* Right */}
             <div className="flex items-center gap-3">
               <IconButton label="Language">
                 <svg
@@ -336,7 +362,6 @@ export default function Header() {
                 </svg>
               </IconButton>
 
-              {/* Menu 버튼: open 시 X 아이콘 */}
               <IconButton
                 label={menuOpen ? "Close menu" : "Menu"}
                 onClick={() => setMenuOpen((v) => !v)}
@@ -399,7 +424,11 @@ export default function Header() {
         </div>
       </header>
 
-      <MenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MenuOverlay
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        theme={theme}
+      />
     </>
   );
 }
