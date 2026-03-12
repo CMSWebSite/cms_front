@@ -10,7 +10,6 @@ import ProfessorPage from "./pages/members/ProfessorPage";
 import StudentsPage from "./pages/members/StudentsPage";
 import StudentDetailPage from "./pages/members/StudentDetailPage";
 import AlumniPage from "./pages/members/AlumniPage";
-import LightLayout from "./styles/LightLayout";
 
 export default function App() {
   return (
@@ -18,16 +17,14 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
 
-        <Route element={<LightLayout />}>
-          <Route path="/research" element={<ResearchPage />} />
-          <Route path="/research/achievements" element={<ResearchPage />} />
-          <Route path="/research/projects" element={<ResearchPage />} />
+        <Route path="/research" element={<ResearchPage />} />
+        <Route path="/research/achievements" element={<ResearchPage />} />
+        <Route path="/research/projects" element={<ResearchPage />} />
 
-          <Route path="/members/professor" element={<ProfessorPage />} />
-          <Route path="/members/students" element={<StudentsPage />} />
-          <Route path="/members/students/:slug" element={<StudentDetailPage />} />
-          <Route path="/members/alumni" element={<AlumniPage />} />
-        </Route>
+        <Route path="/members/professor" element={<ProfessorPage />} />
+        <Route path="/members/students" element={<StudentsPage />} />
+        <Route path="/members/students/:slug" element={<StudentDetailPage />} />
+        <Route path="/members/alumni" element={<AlumniPage />} />
 
         <Route
           path="/research/achievements/journals/:paperId"
