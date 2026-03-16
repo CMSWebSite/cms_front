@@ -213,14 +213,22 @@ function MenuOverlay({ open, onClose }) {
                   }}
                 >
                   <li>
-                    <a className="hover:text-white" href="#">
+                    <Link
+                      to="/about/facilities"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
                       Facilities
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a className="hover:text-white" href="#">
-                      Vision &amp; Mission
-                    </a>
+                    <Link
+                      to="/about/vision"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
+                      Vision & Mission
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -248,24 +256,40 @@ function MenuOverlay({ open, onClose }) {
                   }}
                 >
                   <li>
-                    <a className="hover:text-white" href="#">
-                      News
-                    </a>
+                    <Link
+                      to="/community/recent-news"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
+                      Recent news
+                    </Link>
                   </li>
                   <li>
-                    <a className="hover:text-white" href="#">
+                    <Link
+                      to="/community/gallery"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
                       Gallery
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a className="hover:text-white" href="#">
+                    <Link
+                      to="/community/contact-us"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
                       Contact us
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a className="hover:text-white" href="#">
+                    <Link
+                      to="/community/qna"
+                      onClick={onClose}
+                      className="hover:text-white transition"
+                    >
                       Q&amp;A
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
