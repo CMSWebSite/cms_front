@@ -7,9 +7,6 @@ import PartnersSection from "../components/home/PartnersSection";
 
 
 export default function HomePage() {
-  // useEffect(() => {
-  //   document.documentElement.removeAttribute("data-theme");
-  // }, []);
   return (
     <div className="min-h-screen bg-bg">
       <Header />
