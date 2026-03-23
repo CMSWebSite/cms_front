@@ -20,14 +20,16 @@ import ContactUsPage from "./pages/community/ContactUsPage";
 import QnAPage from "./pages/community/QnAPage";
 import QnaDetailPage from "./pages/community/QnaDetailPage";
 import QnaWritePage from "./pages/community/QnaWritePage";
-// import ContactUsPage from "./pages/community/ContactUsPage";
-// import QnAPage from "./pages/community/QnAPage";
+import LoginPage from "./pages/login/LoginPage";
+import SignupPage from "./pages/signup/SignupPage";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
         <Route path="/research" element={<ResearchPage />} />
         <Route path="/research/achievements" element={<ResearchPage />} />
