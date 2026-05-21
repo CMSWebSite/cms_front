@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import HomePage from "./pages/Homepage";
 import ResearchPage from "./pages/ResearchPage";
 import JournalDetailPage from "./pages/JournalDetailPage";
@@ -23,9 +23,23 @@ import QnaWritePage from "./pages/community/QnaWritePage";
 import LoginPage from "./pages/login/LoginPage";
 import SignupPage from "./pages/signup/SignupPage";
 
+function ThemeRouteSync() {
+  const { pathname } = useLocation();
+
+  // main page: dark, others: light (per current product rule)
+  const theme = pathname === "/" ? "dark" : "light";
+
+  if (typeof document !== "undefined") {
+    document.documentElement.dataset.theme = theme;
+  }
+
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <ThemeRouteSync />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />

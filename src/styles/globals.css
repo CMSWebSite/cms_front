@@ -2,20 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root { height: 100%; }
-
-/* body {
-  margin: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
-} */
+html,
+body,
+#root {
+  height: 100%;
+}
 
 body {
   margin: 0;
-  background: #060b10;
-  color: rgba(255,255,255,0.86);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
 }
 
 @layer base {
@@ -33,17 +30,27 @@ body {
   }
 }
 
+/* legacy: page-local light scope (prefer html[data-theme="light"]) */
+.page-light {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.page-light .page-light-dim {
+  color: var(--color-text-dim);
+}
+
+/* Research 전용 */
+.research-tabs {
+  color: var(--color-text);
+}
+
 .research-tabs a {
-  color: rgba(0,0,0,0.88) !important;
+  color: var(--color-text);
 }
 
 .research-tabs a:hover,
 .research-tabs a:active,
 .research-tabs a:visited {
-  color: rgba(0,0,0,0.88) !important;
-}
-
-.research-scope,
-.research-scope * {
-  color: rgba(0,0,0,0.88) !important;
+  color: var(--color-text);
 }

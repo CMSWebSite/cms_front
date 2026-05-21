@@ -1,6 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
-import logo from "../../assets/icons/logo.png";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import logo from "../../assets/icons/logo.png";
+
+const HEADER_TEXT = "rgba(255,255,255,0.96)";
+const HEADER_TEXT_DIM = "rgba(255,255,255,0.88)";
+
+const baseTextStyle = { color: HEADER_TEXT };
+const dimTextStyle = { color: HEADER_TEXT_DIM };
 
 const IconButton = ({ label, children, onClick, ariaExpanded, active }) => (
   <button
@@ -9,291 +15,148 @@ const IconButton = ({ label, children, onClick, ariaExpanded, active }) => (
     title={label}
     aria-expanded={ariaExpanded}
     onClick={onClick}
-    className={`grid place-items-center p-2 transition ${
-      active ? "text-white" : "text-white/90 hover:text-white"
-    }`}
+    className="grid place-items-center p-2 transition-opacity hover:opacity-100"
+    style={{
+      color: active ? HEADER_TEXT : HEADER_TEXT_DIM,
+      opacity: active ? 1 : 0.95,
+    }}
   >
     {children}
   </button>
 );
 
-function MenuOverlay({ open, onClose }) {
+const NAV_ITEMS = [
+  { key: "home", label: "Home", to: "/" },
+  {
+    key: "research",
+    label: "Research",
+    children: [
+      { label: "Research topics", to: "/research" },
+      { label: "Achievements", to: "/research/achievements" },
+      { label: "Projects", to: "/research/projects" },
+    ],
+  },
+  {
+    key: "members",
+    label: "Members",
+    children: [
+      { label: "Professor", to: "/members/professor" },
+      { label: "Students", to: "/members/students" },
+      { label: "Alumni", to: "/members/alumni" },
+    ],
+  },
+  {
+    key: "about",
+    label: "About us",
+    children: [
+      { label: "Facilities", to: "/about/facilities" },
+      { label: "Vision & Mission", to: "/about/vision" },
+    ],
+  },
+  {
+    key: "community",
+    label: "Community",
+    children: [
+      { label: "Recent news", to: "/community/recent-news" },
+      { label: "Gallery", to: "/community/gallery" },
+      { label: "Contact us", to: "/community/contact-us" },
+      { label: "Q&A", to: "/community/qna" },
+    ],
+  },
+];
+
+function NavDropdown({ openKey, anchorsRef, onClose }) {
+  const [pos, setPos] = useState(null);
+
   useEffect(() => {
-    if (!open) return;
+    if (!openKey) return;
 
     const onKeyDown = (e) => {
       if (e.key === "Escape") onClose();
     };
-
     window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [openKey, onClose]);
 
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+  useEffect(() => {
+    if (!openKey) return;
 
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = prev;
+    const update = () => {
+      const el = anchorsRef.current?.[openKey];
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setPos({
+        left: Math.round(r.left + r.width / 2),
+        top: Math.round(r.bottom),
+      });
     };
-  }, [open, onClose]);
 
-  if (!open) return null;
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [openKey, anchorsRef]);
+
+  if (!openKey) return null;
+
+  const active = NAV_ITEMS.find((x) => x.key === openKey);
+  const items = active?.children ?? null;
+  if (!items?.length) return null;
 
   return (
-    <div className="fixed inset-0 z-[99999]">
+    <div className="fixed inset-0 z-[1101]">
       <button
         type="button"
-        aria-label="Close menu"
+        aria-label="Close dropdown"
         onClick={onClose}
-        className="absolute inset-0"
-        style={{
-          background: "rgba(0,0,0,0.72)",
-          backdropFilter: "blur(100px)",
-          WebkitBackdropFilter: "blur(100px)",
-        }}
+        className="absolute inset-0 z-0 cursor-default"
+        style={{ background: "transparent" }}
       />
 
       <div
-        className="pointer-events-none absolute inset-0"
+        className="absolute z-10"
         style={{
-          background: `
-            radial-gradient(
-              ellipse 80% 70% at 50% 20%,
-              rgba(0,0,0,0) 0%,
-              rgba(0,0,0,0.35) 55%,
-              rgba(0,0,0,0.85) 100%
-            )
-          `,
+          left: pos?.left ?? 0,
+          top: pos?.top ?? 0,
+          transform: "translateX(-50%)",
+          paddingTop: "18px",
         }}
-      />
+      >
+        <ul
+          className="space-y-4 text-center"
+          style={{
+            ...dimTextStyle,
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 600,
+            fontSize: "18px",
+            lineHeight: "26px",
+          }}
+        >
+          {items.map((it) => (
+            <li key={it.to}>
+              <Link
+                to={it.to}
+                onClick={onClose}
+                className="block transition hover:opacity-100"
+                style={dimTextStyle}
+              >
+                {it.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-      <div className="relative z-10 w-full px-6">
-        <div className="w-full pt-[120px] pb-16">
-          <nav className="flex justify-center">
-            <div className="grid grid-cols-5 gap-24">
-              <div className="flex flex-col items-center">
-                <div
-                  className="mb-6 text-white text-center"
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 800,
-                    fontSize: "28px",
-                    lineHeight: "34px",
-                  }}
-                >
-                  Home
-                </div>
-              </div>
-
-              <div className="flex flex-col items-center">
-                <div
-                  className="mb-6 text-white text-center"
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 800,
-                    fontSize: "28px",
-                    lineHeight: "34px",
-                  }}
-                >
-                  Research
-                </div>
-
-                <ul
-                  className="space-y-3 text-white/85 text-left"
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 500,
-                    fontSize: "20px",
-                    lineHeight: "30px",
-                  }}
-                >
-                  <li>
-                    <Link
-                      to="/research"
-                      onClick={onClose}
-                      className="hover:text-white transition"
-                    >
-                      Research topics
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/research/achievements"
-                      onClick={onClose}
-                      className="hover:text-white transition"
-                    >
-                      Achievements
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/research/projects"
-                      onClick={onClose}
-                      className="hover:text-white transition"
-                    >
-                      Projects
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="flex flex-col items-center">
-                <div
-                  className="mb-6 text-white text-center"
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 800,
-                    fontSize: "28px",
-                    lineHeight: "34px",
-                  }}
-                >
-                  Members
-                </div>
-
-                <ul
-                  className="space-y-3 text-white/85 text-left"
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 500,
-                    fontSize: "20px",
-                    lineHeight: "30px",
-                  }}
-                >
-                  <li>
-                    <Link
-                      to="/members/professor"
-                      onClick={onClose}
-                      className="hover:text-white transition"
-                    >
-                      Professor
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/members/students"
-                      onClick={onClose}
-                      className="hover:text-white transition"
-                    >
-                      Students
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/members/alumni"
-                      onClick={onClose}
-                      className="hover:text-white transition"
-                    >
-                      Alumni
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="flex flex-col items-center">
-                <div
-                  className="mb-6 text-white text-center"
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 800,
-                    fontSize: "28px",
-                    lineHeight: "34px",
-                  }}
-                >
-                  About us
-                </div>
-
-                <ul
-                  className="space-y-3 text-white/85 text-left"
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 500,
-                    fontSize: "20px",
-                    lineHeight: "30px",
-                  }}
-                >
-                  <li>
-                    <Link
-                      to="/about/facilities"
-                      onClick={onClose}
-                      className="hover:text-white transition"
-                    >
-                      Facilities
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/about/vision"
-                      onClick={onClose}
-                      className="hover:text-white transition"
-                    >
-                      Vision &amp; Mission
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="flex flex-col items-center">
-                <div
-                  className="mb-6 text-white text-center"
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 800,
-                    fontSize: "28px",
-                    lineHeight: "34px",
-                  }}
-                >
-                  Community
-                </div>
-
-                <ul
-                  className="space-y-3 text-white/85 text-left"
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 500,
-                    fontSize: "20px",
-                    lineHeight: "30px",
-                  }}
-                >
-                  <li>
-                    <Link
-                      to="/community/recent-news"
-                      onClick={onClose}
-                      className="hover:text-white transition"
-                    >
-                      Recent news
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/community/gallery"
-                      onClick={onClose}
-                      className="hover:text-white transition"
-                    >
-                      Gallery
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/community/contact-us"
-                      onClick={onClose}
-                      className="hover:text-white transition"
-                    >
-                      Contact us
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/community/qna"
-                      onClick={onClose}
-                      className="hover:text-white transition"
-                    >
-                      Q&amp;A
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </nav>
-        </div>
+      <div
+        className="pointer-events-none absolute left-0 right-0 top-[96px] z-[1] h-[220px]"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 100%)",
+        }}
+      >
       </div>
     </div>
   );
@@ -302,20 +165,20 @@ function MenuOverlay({ open, onClose }) {
 function HeaderSearchPanel({ query, setQuery, showResults }) {
   const mockResults = useMemo(
     () => ["검색결과", "연구실신청", "topic", "갤러리"],
-    [],
+    []
   );
 
   return (
-    <div className="w-full px-4 sm:px-6">
-      <div className="mx-auto max-w-[1200px]">
-        <div className="pt-2 pb-6">
+    <div className="w-full px-6 lg:px-8" style={baseTextStyle}>
+      <div className="mx-auto max-w-[1320px]">
+        <div className="pb-6 pt-2">
           <div className="flex items-center gap-3">
             <svg
               width="24"
               height="24"
               viewBox="0 0 24 24"
               fill="none"
-              className="shrink-0 text-white"
+              className="shrink-0"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
@@ -332,38 +195,40 @@ function HeaderSearchPanel({ query, setQuery, showResults }) {
             </svg>
 
             <input
-              type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder=""
-              className="w-full bg-transparent text-white outline-none border-0"
+              placeholder="검색어를 입력하세요."
+              className="w-full bg-transparent outline-none placeholder:text-white/45"
               style={{
+                color: HEADER_TEXT,
                 fontFamily: "Inter, sans-serif",
-                fontWeight: 500,
-                fontSize: "22px",
-                lineHeight: "30px",
+                fontWeight: 600,
+                fontSize: "18px",
+                lineHeight: "28px",
               }}
             />
           </div>
 
-          <div className="mt-2 h-[2px] w-full bg-white/90" />
+          <div className="mt-3 h-px w-full bg-white/18" />
 
           {showResults && (
             <div className="pt-4">
               <div
-                className="flex flex-col gap-1 text-white"
+                className="flex flex-col gap-3"
                 style={{
+                  color: HEADER_TEXT_DIM,
                   fontFamily: "Inter, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "18px",
-                  lineHeight: "1.5",
+                  fontWeight: 500,
+                  fontSize: "15px",
+                  lineHeight: "24px",
                 }}
               >
                 {mockResults.map((item) => (
                   <button
                     key={item}
                     type="button"
-                    className="w-fit text-left text-white hover:text-white/80 transition"
+                    className="w-fit text-left transition hover:opacity-85"
+                    style={dimTextStyle}
                   >
                     {item}
                   </button>
@@ -379,10 +244,10 @@ function HeaderSearchPanel({ query, setQuery, showResults }) {
 
 function HeaderLanguagePanel() {
   return (
-    <div className="w-full px-4 sm:px-6">
-      <div className="mx-auto max-w-[1200px]">
-        <div className="pt-2 pb-4">
-          <div className="flex items-center gap-5 text-white">
+    <div className="w-full px-6 lg:px-8" style={baseTextStyle}>
+      <div className="mx-auto max-w-[1320px]">
+        <div className="pb-4 pt-2">
+          <div className="flex items-center gap-5">
             <svg
               width="24"
               height="24"
@@ -406,8 +271,9 @@ function HeaderLanguagePanel() {
 
             <button
               type="button"
-              className="text-white hover:text-white/80 transition"
+              className="transition hover:opacity-85"
               style={{
+                ...baseTextStyle,
                 fontFamily: "Inter, sans-serif",
                 fontWeight: 700,
                 fontSize: "16px",
@@ -419,8 +285,9 @@ function HeaderLanguagePanel() {
 
             <button
               type="button"
-              className="text-white hover:text-white/80 transition"
+              className="transition hover:opacity-85"
               style={{
+                ...baseTextStyle,
                 fontFamily: "Inter, sans-serif",
                 fontWeight: 700,
                 fontSize: "16px",
@@ -436,35 +303,34 @@ function HeaderLanguagePanel() {
   );
 }
 
-export default function Header({ theme = "dark" }) {
-  const [menuOpen, setMenuOpen] = useState(false);
+export default function Header() {
+  const [openNav, setOpenNav] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const navAnchorsRef = useRef({});
 
   const showSearchResults = query.trim().length > 0;
-
-  const headerExpanded = searchOpen || languageOpen;
-  const headerHeight = headerExpanded ? "h-[170px]" : "h-[96px]";
+  const headerExpanded = !!openNav || searchOpen || languageOpen;
+  const headerHeight = openNav
+    ? "h-[260px]"
+    : headerExpanded
+      ? "h-[170px]"
+      : "h-[96px]";
 
   const closeUtilityPanels = () => {
     setSearchOpen(false);
     setLanguageOpen(false);
   };
 
-  const handleToggleMenu = () => {
-    closeUtilityPanels();
-    setMenuOpen((prev) => !prev);
-  };
-
   const handleToggleSearch = () => {
-    setMenuOpen(false);
+    setOpenNav(null);
     setLanguageOpen(false);
     setSearchOpen((prev) => !prev);
   };
 
   const handleToggleLanguage = () => {
-    setMenuOpen(false);
+    setOpenNav(null);
     setSearchOpen(false);
     setLanguageOpen((prev) => !prev);
   };
@@ -472,8 +338,9 @@ export default function Header({ theme = "dark" }) {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-[1000] w-full overflow-hidden text-white transition-all duration-300 ${headerHeight}`}
+        className={`fixed left-0 right-0 top-0 z-[1000] w-full overflow-hidden transition-all duration-300 ${headerHeight}`}
         style={{
+          color: HEADER_TEXT,
           background:
             "linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(1,18,24,0.95) 60%, rgba(1,18,24,0.92) 100%)",
           backdropFilter: "blur(4px)",
@@ -488,44 +355,117 @@ export default function Header({ theme = "dark" }) {
           }}
         />
 
-        <div className="relative w-full px-6">
+        <div className="relative mx-auto h-full w-full max-w-[1480px] px-8 lg:px-12">
           <div className="w-full">
-            <div className="h-[72px] flex items-center justify-between">
-              <Link to="/" className="flex items-center gap-3 text-white">
+            <div className="flex h-[72px] items-center justify-between">
+              <Link
+                to="/"
+                className="flex items-center gap-3"
+                style={baseTextStyle}
+              >
                 <img
                   src={logo}
                   alt="CMS LAB"
-                  className="w-[40px] h-[44px] object-contain sm:w-[44px] sm:h-[48px]"
+                  className="h-[44px] w-[40px] object-contain sm:h-[48px] sm:w-[44px]"
                   draggable="false"
                 />
                 <div
+                  className="select-none"
                   style={{
+                    ...baseTextStyle,
                     fontFamily: "Unna, serif",
                     fontWeight: 700,
                     fontSize: "14px",
                     lineHeight: "13px",
                     letterSpacing: "0.01em",
                   }}
-                  className="select-none"
                 >
                   <div>CYBER MARINE</div>
                   <div>SYSTEM LAB</div>
                 </div>
               </Link>
 
-              <div className="flex items-center gap-1">
-                <Link
-                  to="/login"
-                  className="mr-4 text-white/95 hover:text-white transition"
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 500,
-                    fontSize: "16px",
-                    lineHeight: "24px",
-                  }}
-                >
-                  Sign up / Login
-                </Link>
+              <nav className="mx-6 flex min-w-0 flex-1 items-center justify-center gap-28 overflow-x-auto whitespace-nowrap lg:mx-10 lg:gap-28 lg:overflow-visible">
+                {NAV_ITEMS.map((item) => {
+                  const hasChildren = !!item.children?.length;
+                  if (!hasChildren) {
+                    return (
+                      <Link
+                        key={item.key}
+                        to={item.to}
+                        className="transition hover:opacity-100"
+                        style={{
+                          ...dimTextStyle,
+                          fontFamily: "Inter, sans-serif",
+                          fontWeight: 700,
+                          fontSize: "20px",
+                          lineHeight: "28px",
+                        }}
+                        onClick={() => setOpenNav(null)}
+                      >
+                        {item.label}
+                      </Link>
+                    );
+                  }
+
+                  const isOpen = openNav === item.key;
+                  return (
+                    <button
+                      key={item.key}
+                      ref={(el) => {
+                        if (!el) return;
+                        navAnchorsRef.current[item.key] = el;
+                      }}
+                      type="button"
+                      aria-expanded={isOpen}
+                      onClick={() => {
+                        closeUtilityPanels();
+                        setOpenNav((prev) => (prev === item.key ? null : item.key));
+                      }}
+                      className="flex items-center transition hover:opacity-100"
+                      style={{
+                        color: isOpen ? HEADER_TEXT : HEADER_TEXT_DIM,
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: 700,
+                        fontSize: "20px",
+                        lineHeight: "28px",
+                      }}
+                    >
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+
+              <div className="flex items-center gap-1 text-white">
+                <div className="mr-5 flex items-center gap-4">
+                  <Link
+                    to="/login"
+                    className="transition hover:opacity-100"
+                    style={{
+                      ...dimTextStyle,
+                      fontFamily: "Inter, sans-serif",
+                      fontWeight: 500,
+                      fontSize: "18px",
+                      lineHeight: "26px",
+                    }}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="transition hover:opacity-100"
+                    style={{
+                      ...dimTextStyle,
+                      fontFamily: "Inter, sans-serif",
+                      fontWeight: 500,
+                      fontSize: "18px",
+                      lineHeight: "26px",
+                    }}
+                  >
+                    Sign up
+                  </Link>
+                </div>
 
                 <IconButton
                   label="Language"
@@ -538,7 +478,6 @@ export default function Header({ theme = "dark" }) {
                     height="24"
                     viewBox="0 0 24 24"
                     fill="none"
-                    className="opacity-95"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
@@ -546,11 +485,7 @@ export default function Header({ theme = "dark" }) {
                       stroke="currentColor"
                       strokeWidth="1.8"
                     />
-                    <path
-                      d="M2 12H22"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                    />
+                    <path d="M2 12H22" stroke="currentColor" strokeWidth="1.8" />
                     <path
                       d="M12 2C14.7614 4.66667 16 8 16 12C16 16 14.7614 19.3333 12 22C9.23858 19.3333 8 16 8 12C8 8 9.23858 4.66667 12 2Z"
                       stroke="currentColor"
@@ -570,7 +505,6 @@ export default function Header({ theme = "dark" }) {
                     height="24"
                     viewBox="0 0 24 24"
                     fill="none"
-                    className="opacity-95"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
@@ -587,64 +521,6 @@ export default function Header({ theme = "dark" }) {
                   </svg>
                 </IconButton>
 
-                <IconButton
-                  label={menuOpen ? "Close menu" : "Menu"}
-                  onClick={handleToggleMenu}
-                  ariaExpanded={menuOpen}
-                  active={menuOpen}
-                >
-                  {menuOpen ? (
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      className="opacity-95"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M6 6L18 18"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M18 6L6 18"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      className="opacity-95"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M4 7H20"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M4 12H20"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M4 17H20"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  )}
-                </IconButton>
               </div>
             </div>
 
@@ -661,7 +537,11 @@ export default function Header({ theme = "dark" }) {
         </div>
       </header>
 
-      <MenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <NavDropdown
+        openKey={openNav}
+        anchorsRef={navAnchorsRef}
+        onClose={() => setOpenNav(null)}
+      />
     </>
   );
 }
