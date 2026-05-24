@@ -203,16 +203,15 @@ export default function JournalDetailPage() {
         className="relative z-0 bg-white"
         style={{ backgroundColor: "#fff", color: "rgba(0,0,0,0.88)" }}
       >
-        <div className="h-[96px]" />
+        <div className="h-[88px]" />
 
         <div data-theme="light" className="text-black">
-          {/* 상단 탭은 유지하고 싶으면 ResearchTabs도 여기 넣으면 됨 */}
-          {/* <ResearchTabs /> */}
+          {/* 상단 Research 탭 유지 */}
+          <ResearchTabs />
 
           <section className="w-full bg-white">
             <div className="mx-auto max-w-container px-6 pb-24">
               {/* breadcrumb */}
-              <ResearchTabs />
               <div className="pt-6 text-[14px] text-black/70 font-medium">
                 <span className="mr-2">⌂</span>
                 <Link to="/research" className="hover:underline">

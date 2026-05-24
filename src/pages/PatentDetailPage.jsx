@@ -41,7 +41,7 @@ export default function PatentDetailPage() {
         className="relative z-0 bg-white"
         style={{ backgroundColor: "#fff", color: "rgba(0,0,0,0.88)" }}
       >
-        <div className="h-[96px]" />
+        <div className="h-[88px]" />
 
         <div data-theme="light" className="text-black">
           <ResearchTabs />

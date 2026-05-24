@@ -46,7 +46,7 @@ export default function ConferenceDetailPage() {
         style={{ backgroundColor: "#fff", color: "rgba(0,0,0,0.88)" }}
       >
         {/* fixed header space */}
-        <div className="h-[96px]" />
+        <div className="h-[88px]" />
 
         <div data-theme="light" className="text-black">
           {/* 상단 Research 탭 유지 */}

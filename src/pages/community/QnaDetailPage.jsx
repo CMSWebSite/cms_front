@@ -43,7 +43,7 @@ export default function QnaDetailPage() {
     <div className="min-h-screen bg-[#f3f3f3]">
       <Header />
 
-      <main className="pt-[96px]">
+      <main className="pt-[88px]">
         {/* Community tab */}
         <section className="w-full bg-[#dddddd]">
           <div className="mx-auto max-w-[1280px] px-12">

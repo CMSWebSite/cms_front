@@ -74,7 +74,7 @@ export default function RecentNewsPage() {
     <div className="min-h-screen bg-[#f3f3f3]">
       <Header />
 
-      <main className="pt-[96px]">
+      <main className="pt-[88px]">
         <section className="w-full bg-[#dddddd]">
           <div className="mx-auto max-w-[1280px] px-12">
             <div className="flex h-[56px] items-center gap-8">
