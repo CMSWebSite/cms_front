@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 600" role="img" aria-label="해양 AI 특화 연구 일러스트레이션">
+  <defs>
+    <linearGradient id="c3sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a1736"/>
+      <stop offset="1" stop-color="#21476f"/>
+    </linearGradient>
+    <linearGradient id="c3sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#123a63"/>
+      <stop offset="1" stop-color="#040c1e"/>
+    </linearGradient>
+    <radialGradient id="c3sun" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffb066" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#ffb066" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1100" height="322" fill="url(#c3sky)"/>
+  <rect y="322" width="1100" height="278" fill="url(#c3sea)"/>
+  <ellipse cx="660" cy="322" rx="340" ry="160" fill="url(#c3sun)"/>
+  <g fill="#cfe3f5" opacity=".7">
+    <circle cx="140" cy="70" r="2"/>
+    <circle cx="280" cy="48" r="1.6"/>
+    <circle cx="520" cy="60" r="2"/>
+    <circle cx="940" cy="80" r="1.8"/>
+    <circle cx="1010" cy="150" r="2"/>
+  </g>
+
+  <g stroke="#86b6d6" stroke-width="5" fill="none" opacity=".9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M118 322V152H360"/>
+    <path d="M208 322V152"/>
+    <path d="M163 152V112H132"/>
+    <path d="M300 152V200"/>
+    <path d="M262 322V176H496"/>
+    <path d="M352 322V176"/>
+    <path d="M312 176V134H280"/>
+    <path d="M438 176V222"/>
+  </g>
+
+  <path d="M356 300H772L814 322L788 354L386 354Z" fill="#0b1f3e" stroke="#5aa6d6" stroke-width="2.5"/>
+  <rect x="372" y="214" width="56" height="88" fill="#0c2547" stroke="#5aa6d6" stroke-width="2"/>
+  <rect x="389" y="188" width="24" height="28" fill="#0c2547" stroke="#5aa6d6" stroke-width="2"/>
+  <g fill="#ffce8a">
+    <rect x="380" y="226" width="9" height="9"/>
+    <rect x="396" y="226" width="9" height="9"/>
+    <rect x="412" y="226" width="9" height="9"/>
+    <rect x="380" y="244" width="9" height="9"/>
+    <rect x="396" y="244" width="9" height="9"/>
+    <rect x="412" y="244" width="9" height="9"/>
+  </g>
+  <rect x="430" y="234" width="304" height="68" fill="#0c2547" stroke="#5aa6d6" stroke-width="2"/>
+  <g stroke="#3f7ba8" stroke-width="1.4">
+    <path d="M430 268H734"/>
+    <path d="M468 234V302M506 234V302M544 234V302M582 234V302M620 234V302M658 234V302M696 234V302"/>
+  </g>
+  <g fill="#ff9d4d">
+    <rect x="470" y="237" width="34" height="29"/>
+    <rect x="584" y="270" width="34" height="29"/>
+    <rect x="660" y="237" width="34" height="29"/>
+  </g>
+  <rect x="508" y="270" width="34" height="29" fill="#36c6e6"/>
+
+  <g stroke-linecap="round" opacity=".5">
+    <path d="M470 360V430" stroke="#ff9d4d" stroke-width="6"/>
+    <path d="M560 360V446" stroke="#cfe6f5" stroke-width="5"/>
+    <path d="M650 360V424" stroke="#ff9d4d" stroke-width="6"/>
+    <path d="M730 360V438" stroke="#36c6e6" stroke-width="5"/>
+  </g>
+  <g stroke="#4f9fc8" stroke-width="2.4" fill="none" opacity=".5" stroke-linecap="round">
+    <path d="M120 400q40 -16 80 0t80 0 80 0 80 0"/>
+    <path d="M620 432q40 -16 80 0t80 0 80 0 80 0"/>
+    <path d="M180 482q46 -18 92 0t92 0 92 0"/>
+    <path d="M700 500q46 -18 92 0t92 0"/>
+  </g>
+
+  <g stroke="#5fc6f0" stroke-width="1.8" fill="none" opacity=".6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M170 96L360 150L548 92L742 140L930 188"/>
+    <path d="M360 150L300 250L520 470"/>
+    <path d="M742 140L760 250L720 452"/>
+    <path d="M548 92L560 240"/>
+    <path d="M300 250L520 470L720 452L930 188"/>
+  </g>
+  <g fill="#7fd6ff">
+    <circle cx="170" cy="96" r="6"/>
+    <circle cx="360" cy="150" r="7"/>
+    <circle cx="548" cy="92" r="6"/>
+    <circle cx="742" cy="140" r="7"/>
+    <circle cx="930" cy="188" r="6"/>
+    <circle cx="300" cy="250" r="6"/>
+    <circle cx="560" cy="240" r="6"/>
+    <circle cx="760" cy="250" r="6"/>
+    <circle cx="520" cy="470" r="7"/>
+    <circle cx="720" cy="452" r="6"/>
+  </g>
+  <g fill="#ffb066">
+    <circle cx="360" cy="150" r="3.4"/>
+    <circle cx="520" cy="470" r="3.4"/>
+    <circle cx="742" cy="140" r="3.4"/>
+  </g>
+</svg>

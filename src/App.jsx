@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AuthProvider } from "./auth/AuthProvider";
 import HomePage from "./pages/Homepage";
 import ResearchPage from "./pages/ResearchPage";
 import JournalDetailPage from "./pages/JournalDetailPage";
@@ -38,9 +39,10 @@ function ThemeRouteSync() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <ThemeRouteSync />
-      <Routes>
+    <AuthProvider>
+      <BrowserRouter>
+        <ThemeRouteSync />
+        <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
@@ -86,7 +88,8 @@ export default function App() {
           path="/research/projects/:projectId"
           element={<ProjectDetailPage />}
         />
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }

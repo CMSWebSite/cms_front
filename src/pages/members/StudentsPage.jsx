@@ -64,7 +64,7 @@ export default function StudentsPage() {
     <div className="min-h-screen bg-white text-black">
       <Header theme="dark" />
 
-      <main className="bg-white pt-[96px]">
+      <main className="bg-white pt-[88px]">
         <section className="h-[54px] w-full bg-[#dcdcdc]">
           <div className="mx-auto flex h-full w-full max-w-[1280px] items-center px-[34px]">
             <div className="flex items-center gap-[34px] text-[18px] font-semibold text-black">

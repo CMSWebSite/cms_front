@@ -50,7 +50,7 @@ export default function ProjectDetailPage() {
         className="relative z-0 bg-white"
         style={{ backgroundColor: "#fff", color: "rgba(0,0,0,0.88)" }}
       >
-        <div className="h-[96px]" />
+        <div className="h-[88px]" />
 
         <div data-theme="light" className="text-black">
           {/* 상단 Research 탭 유지(스샷처럼) */}

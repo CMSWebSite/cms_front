@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(findstr /C:\"react-router\" /C:\"tailwind\" /C:\"react\\\\\"\")",
+      "Bash(npx eslint *)",
+      "Bash(node -e \"try{require.resolve\\('playwright'\\);console.log\\('playwright OK'\\)}catch\\(e\\){console.log\\('no playwright'\\)}\")",
+      "Bash(npx --no-install playwright --version)",
+      "Bash(npx vite *)",
+      "Bash(timeout 30 bash -c 'until grep -qi \"ready in\" \"C:/Users/foxes/AppData/Local/Temp/claude/c--Users-foxes-LYS-cybermarine-cmsweb-cms-front/2729fcfd-ea04-4d2f-9f30-581abc08be71/tasks/bifqtgx11.output\" 2>/dev/null; do sleep 0.5; done; echo READY')"
+    ]
+  }
+}
