@@ -11,6 +11,11 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
       },
+      // 관리자 업로드 파일(/uploads/**)도 백엔드에서 서빙됨
+      '/uploads': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
     },
   },
 })

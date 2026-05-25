@@ -1,13 +1,33 @@
-export default function Footer() {
-  const sepStyle = {
-    margin: "0 20px", // ← span 사이 좌우 여백 증가
-    opacity: 0.35,
-  };
+import { useEffect, useState } from "react";
+import { publicSiteSettingsApi } from "../../api/public/siteSettings";
 
-  const itemStyle = {
-    paddingTop: 8, // ← 각 항목 상하 여백 증가
-    paddingBottom: 8,
-  };
+const DEFAULTS = {
+  "footer.phone": "+82 010-XXXX-XXXX",
+  "footer.fax": "+82 010-XXXX-XXXX",
+  "footer.address": "(49112) 부산광역시 영도구 태종로 727(동삼동) 한국해양대학교 공과대학 2호관 638호",
+  "footer.copyright": "Copyright © 2026 Cybermarine System Lab. All Rights Reserved.",
+};
+
+export default function Footer() {
+  const [settings, setSettings] = useState(DEFAULTS);
+
+  useEffect(() => {
+    let mounted = true;
+    publicSiteSettingsApi.all()
+      .then((d) => {
+        if (!mounted || !d) return;
+        const next = { ...DEFAULTS };
+        for (const k of Object.keys(DEFAULTS)) {
+          if (d[k]) next[k] = d[k];
+        }
+        setSettings(next);
+      })
+      .catch(() => {});
+    return () => { mounted = false; };
+  }, []);
+
+  const sepStyle = { margin: "0 20px", opacity: 0.35 };
+  const itemStyle = { paddingTop: 8, paddingBottom: 8 };
 
   return (
     <footer
@@ -23,7 +43,7 @@ export default function Footer() {
           margin: "0 auto",
           paddingLeft: 32,
           paddingRight: 32,
-          paddingTop: 28, // ← footer 상하 여백 증가
+          paddingTop: 28,
           paddingBottom: 28,
         }}
       >
@@ -32,7 +52,7 @@ export default function Footer() {
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            justifyContent: "flex-start", // ← 좌측 정렬
+            justifyContent: "flex-start",
             fontSize: 12,
             letterSpacing: "0.06em",
             color: "rgba(255,255,255,0.6)",
@@ -44,23 +64,17 @@ export default function Footer() {
           </a>
 
           <span style={{ ...sepStyle, ...itemStyle }}>|</span>
-
-          <span style={itemStyle}>Tel +82 010-XXXX-XXXX</span>
-
-          <span style={{ ...sepStyle, ...itemStyle }}>|</span>
-
-          <span style={itemStyle}>FAX +82 010-XXXX-XXXX</span>
+          <span style={itemStyle}>Tel {settings["footer.phone"]}</span>
 
           <span style={{ ...sepStyle, ...itemStyle }}>|</span>
-
-          <span style={itemStyle}>
-            (49112) 부산광역시 영도구 태종로 727(동삼동) 한국해양대학교 공과대학 2호관 638호
-          </span>
+          <span style={itemStyle}>FAX {settings["footer.fax"]}</span>
 
           <span style={{ ...sepStyle, ...itemStyle }}>|</span>
+          <span style={itemStyle}>{settings["footer.address"]}</span>
 
+          <span style={{ ...sepStyle, ...itemStyle }}>|</span>
           <span style={{ ...itemStyle, color: "rgba(255,255,255,0.45)" }}>
-            Copyright © 2026 Cybermarine System Lab. All Rights Reserved.
+            {settings["footer.copyright"]}
           </span>
         </div>
       </div>

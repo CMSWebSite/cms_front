@@ -31,16 +31,25 @@ export async function apiRequest(path, { method = "GET", body, headers } = {}) {
   // 로그인 상태면 JWT 토큰을 Authorization 헤더로 첨부한다.
   const token = getToken();
 
+  // FormData 본문이면 Content-Type을 지정하지 않는다(브라우저가 boundary 포함해서 설정).
+  const isFormData =
+    typeof FormData !== "undefined" && body instanceof FormData;
+
   let response;
   try {
     response = await fetch(`${BASE_URL}${path}`, {
       method,
       headers: {
-        "Content-Type": "application/json",
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
       },
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body:
+        body === undefined
+          ? undefined
+          : isFormData
+            ? body
+            : JSON.stringify(body),
     });
   } catch {
     // fetch 자체가 실패 = 네트워크 연결 문제
