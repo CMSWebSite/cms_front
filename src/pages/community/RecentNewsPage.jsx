@@ -1,80 +1,48 @@
+import { useEffect, useState } from "react";
 import Header from "../../components/common/Header";
 import Footer from "../../components/common/Footer";
 import { Link } from "react-router-dom";
+import { publicNewsApi } from "../../api/public/news";
+import { ApiError } from "../../api/client";
+
+function formatDate(isoString) {
+  if (!isoString) return "";
+  const d = new Date(isoString);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
 
 export default function RecentNewsPage() {
-  const news = [
-    {
-      id: 1,
-      title: "한국해양대학교 이광일 교수, 세계 자율운항선박 표준화 사령탑된다",
-      date: "2025-06-11",
-      image: "/images/news/news1.jpg",
-      content: [
-        "국립한국해양대학교는 지난 21~22일 일본 나가사키에서 열린 국제전기위원회(IEC) 해상 항해통신 장비와 시스템위원회(TC80) 총회에 자율운항선박을 위한 신규 특별작업반 의장에 인공지능공학부 이광일 교수가 선임됐다고 28일 밝혔다.",
-        "국제전기연합 산하의 항해와 통신 관련 주요 표준을 개발하는 국제표준화기구로 자율운항선박의 핵심 요소기술인 자율항해시스템(ANS), 정보관리 및 원격운영센터(ROC) 등에 대한 국제표준을 담당할 예정이다. 이를 위해 이번 IEC TC80 총회에서는 자율운항선박 관련 특별작업반을 설치하고 신임 의장으로 이 교수를 선임했다.",
-        "신규작업반은 자율운항선박의 핵심기술인 인공지능을 이용한 상황인지기술, 자율항해시스템(ANS), 정보관리, 원격운영센터(ROC) 등 항해·통신 등에 대한 표준 개발을 담당한다.",
-        "이 교수는 앞으로 선박 장비 사이버보안 표준에 대한 개정을 제안하고 선박에 탑재되는 개별 선박 장비에 대한 사이버보안 표준 개발을 주도하기로 했다. 특히 항해통신장비의 특성을 반영하면서 국제선급 규정을 충족하는 사이버보안 표준을 개발할 예정이다.",
-      ],
-    },
-    {
-      id: 2,
-      title: '한국해양대학교 이광일 교수 "단기 성과위주 정책, 예산 낭비 될수도"',
-      date: "2025-06-11",
-      image: "/images/news/news2.jpg",
-      content: [
-        "두 번째 기사 본문 예시입니다.",
-        "실제 기사 내용으로 바꿔 넣으면 됩니다.",
-      ],
-    },
-    {
-      id: 3,
-      title: "이광일 한국해양대 교수, 세계 자율운항선박 표준화 사령탑된다",
-      date: "2025-06-11",
-      image: "/images/news/news1.jpg",
-      content: ["기사 본문 예시입니다."],
-    },
-    {
-      id: 4,
-      title: '한국해양대학교 이광일 교수 "단기 성과위주 정책, 예산 낭비 될수도"',
-      date: "2025-06-11",
-      image: "/images/news/news2.jpg",
-      content: ["기사 본문 예시입니다."],
-    },
-    {
-      id: 5,
-      title: "이광일 한국해양대 교수, 세계 자율운항선박 표준화 사령탑된다",
-      date: "2025-06-11",
-      image: "/images/news/news1.jpg",
-      content: ["기사 본문 예시입니다."],
-    },
-    {
-      id: 6,
-      title: '한국해양대학교 이광일 교수 "단기 성과위주 정책, 예산 낭비 될수도"',
-      date: "2025-06-11",
-      image: "/images/news/news2.jpg",
-      content: ["기사 본문 예시입니다."],
-    },
-    {
-      id: 7,
-      title: "이광일 한국해양대 교수, 세계 자율운항선박 표준화 사령탑된다",
-      date: "2025-06-11",
-      image: "/images/news/news1.jpg",
-      content: ["기사 본문 예시입니다."],
-    },
-    {
-      id: 8,
-      title: '한국해양대학교 이광일 교수 "단기 성과위주 정책, 예산 낭비 될수도"',
-      date: "2025-06-11",
-      image: "/images/news/news2.jpg",
-      content: ["기사 본문 예시입니다."],
-    },
-  ];
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    publicNewsApi
+      .list()
+      .then((res) => {
+        if (mounted) setNews(res);
+      })
+      .catch((err) => {
+        if (mounted) {
+          setError(
+            err instanceof ApiError ? err.message : "뉴스를 불러오지 못했습니다.",
+          );
+        }
+      })
+      .finally(() => mounted && setLoading(false));
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#f3f3f3]">
       <Header />
 
-      <main className="pt-[96px]">
+      <main className="pt-[88px]">
         <section className="w-full bg-[#dddddd]">
           <div className="mx-auto max-w-[1280px] px-12">
             <div className="flex h-[56px] items-center gap-8">
@@ -164,24 +132,59 @@ export default function RecentNewsPage() {
               </thead>
 
               <tbody>
-                {news.map((item) => (
-                  <tr key={item.id} className="border-b border-[#d7d7d7]">
-                    <td className="py-[18px] text-center text-[15px] text-black">
-                      {item.id}
-                    </td>
-                    <td className="py-[18px] text-center text-[15px] text-black">
-                      <Link
-                        to={`/community/recent-news/${item.id}`}
-                        className="hover:underline"
-                      >
-                        {item.title}
-                      </Link>
-                    </td>
-                    <td className="py-[18px] text-center text-[15px] text-black">
-                      {item.date}
+                {loading && (
+                  <tr>
+                    <td
+                      colSpan={3}
+                      className="py-[80px] text-center text-[15px] text-black/60"
+                    >
+                      불러오는 중…
                     </td>
                   </tr>
-                ))}
+                )}
+
+                {!loading && error && (
+                  <tr>
+                    <td
+                      colSpan={3}
+                      className="py-[80px] text-center text-[15px] text-red-600"
+                    >
+                      {error}
+                    </td>
+                  </tr>
+                )}
+
+                {!loading && !error && news.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={3}
+                      className="py-[80px] text-center text-[15px] text-black/60"
+                    >
+                      아직 등록된 뉴스가 없습니다.
+                    </td>
+                  </tr>
+                )}
+
+                {!loading &&
+                  !error &&
+                  news.map((item, index) => (
+                    <tr key={item.id} className="border-b border-[#d7d7d7]">
+                      <td className="py-[18px] text-center text-[15px] text-black">
+                        {news.length - index}
+                      </td>
+                      <td className="py-[18px] text-center text-[15px] text-black">
+                        <Link
+                          to={`/community/recent-news/${item.id}`}
+                          className="hover:underline"
+                        >
+                          {item.title}
+                        </Link>
+                      </td>
+                      <td className="py-[18px] text-center text-[15px] text-black">
+                        {formatDate(item.publishedAt)}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>

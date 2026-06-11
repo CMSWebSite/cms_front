@@ -1,123 +1,122 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { publicProjectsApi } from "../../api/public/projects";
+import { ApiError } from "../../api/client";
+import LoadingState from "../common/LoadingState";
+import EmptyState from "../common/EmptyState";
+import ErrorState from "../common/ErrorState";
+import Pagination from "../common/Pagination";
 
-const FILTERS = ["전체", "수행 중", "수행 완료"];
-const FIELDS = ["제목", "분류", "기간"];
-
-const DATA = [
-  {
-    id: 1,
-    status: "수행 중",
-    title:
-      "[KMOU BRIDGE 3.0 융복합 공동기술사업화] 소형 선박용 영상분석 기반 이상행동 탐지 기술 개발",
-    period: "2025-06-11",
-  },
-  {
-    id: 2,
-    status: "수행 완료",
-    title:
-      "[재난안전 공동연구 기술개발사업] 생성형 AI 기반 안전제도 진단 지원시스템 개발",
-    period: "2025-07-18 ~ 2026-01-03",
-  },
+const FILTERS = [
+  { label: "전체", value: "" },
+  { label: "수행 중", value: "ONGOING" },
+  { label: "수행 완료", value: "COMPLETED" },
 ];
+const FIELDS = ["제목"];
+
+const STATUS_LABEL = {
+  PLANNED: "계획",
+  ONGOING: "수행 중",
+  COMPLETED: "수행 완료",
+  SUSPENDED: "보류",
+};
+
+const PAGE_SIZE = 10;
+
+function formatDate(isoDate) {
+  if (!isoDate) return "";
+  return typeof isoDate === "string" ? isoDate.slice(0, 10) : "";
+}
 
 export default function ProjectsView() {
-  const [filter, setFilter] = useState("전체");
+  const [filter, setFilter] = useState("");
   const [field, setField] = useState("제목");
-  const [q, setQ] = useState("");
+  const [qInput, setQInput] = useState("");
+  const [keyword, setKeyword] = useState("");
+  const [page, setPage] = useState(1);
 
-  const rows = useMemo(() => {
-    const base =
-      filter === "전체" ? DATA : DATA.filter((r) => r.status === filter);
+  const [data, setData] = useState({ items: [], totalPages: 0, totalItems: 0, page: 1 });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    const keyword = q.trim();
-    if (!keyword) return base;
+  const reload = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    publicProjectsApi
+      .list({
+        page,
+        limit: PAGE_SIZE,
+        keyword: keyword || undefined,
+        status: filter || undefined,
+      })
+      .then(setData)
+      .catch((err) =>
+        setError(err instanceof ApiError ? err.message : "불러오지 못했습니다."),
+      )
+      .finally(() => setLoading(false));
+  }, [page, keyword, filter]);
 
-    return base.filter((r) => {
-      if (field === "제목") return r.title.includes(keyword);
-      if (field === "분류") return r.status.includes(keyword);
-      if (field === "기간") return r.period.includes(keyword);
-      return true;
-    });
-  }, [filter, field, q]);
+  useEffect(() => { reload(); }, [reload]);
+
+  useEffect(() => { setPage(1); }, [filter]);
+
+  const submitSearch = (e) => {
+    e.preventDefault();
+    setKeyword(qInput.trim());
+    setPage(1);
+  };
+
+  const items = data.items;
 
   return (
     <div className="w-full">
-      {/* ✅ 섹션 타이틀 + 우측 필터 */}
       <div className="mt-14 flex items-end justify-between">
         <div>
-          <h2 className="text-[60px] leading-[1] font-extrabold tracking-[-0.02em] text-black">
-            Projects
-          </h2>
+          <h2 className="text-[60px] leading-[1] font-extrabold tracking-[-0.02em] text-black">Projects</h2>
           <div className="mt-4 h-[2px] w-[120px] bg-black/80" />
         </div>
 
         <div className="flex items-center gap-3 text-[13px] font-semibold text-black">
           {FILTERS.map((f) => (
             <button
-              key={f}
+              key={f.label}
               type="button"
-              onClick={() => setFilter(f)}
-              className={[
-                "px-1",
-                filter === f ? "text-black" : "text-black/60 hover:text-black",
-              ].join(" ")}
+              onClick={() => setFilter(f.value)}
+              className={["px-1", filter === f.value ? "text-black" : "text-black/60 hover:text-black"].join(" ")}
             >
-              {f}
+              {f.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* ✅ 테이블 */}
       <div className="mt-6">
         <div className="border-t border-b border-black/40">
-          {/* 헤더 */}
-          <div
-            className="grid items-center text-[13px] font-semibold text-black/80"
-            style={{
-              gridTemplateColumns: "80px 140px 1fr 200px",
-              height: 44,
-            }}
-          >
+          <div className="grid items-center text-[13px] font-semibold text-black/80" style={{ gridTemplateColumns: "80px 140px 1fr 220px", height: 44 }}>
             <div className="px-3">순서</div>
             <div className="px-3">분류</div>
             <div className="px-3 text-center">제목</div>
             <div className="px-3 text-center">수행 기간</div>
           </div>
-
           <div className="h-px bg-black/30" />
 
-          {/* 바디 */}
-          {rows.length === 0 ? (
-            <div className="py-12 text-center text-[14px] text-black/50">
-              데이터가 없습니다.
-            </div>
-          ) : (
-            rows.map((r, idx) => (
-              <div
-                key={r.id}
-                className="grid items-center text-[13px] text-black"
-                style={{
-                  gridTemplateColumns: "80px 140px 1fr 200px",
-                  minHeight: 56,
-                }}
-              >
-                <div className="px-3 text-center">{idx + 1}</div>
-                <div className="px-3 text-center">{r.status}</div>
+          {loading && <LoadingState />}
+          {!loading && error && <ErrorState message={error} onRetry={reload} />}
 
-                {/* 제목: 스샷처럼 가운데 정렬 + 말줄임 */}
+          {!loading && !error && items.length === 0 ? (
+            <EmptyState title={keyword ? "검색 결과가 없습니다." : "아직 등록된 프로젝트가 없습니다."} />
+          ) : (
+            !loading && !error && items.map((r, idx) => (
+              <div key={r.id} className="grid items-center text-[13px] text-black" style={{ gridTemplateColumns: "80px 140px 1fr 220px", minHeight: 56 }}>
+                <div className="px-3 text-center">{(data.page - 1) * PAGE_SIZE + idx + 1}</div>
+                <div className="px-3 text-center">{STATUS_LABEL[r.status] ?? r.status}</div>
                 <div className="px-3">
-                  <Link
-                    to={`/research/projects/${r.id}`}
-                    className="block truncate text-center hover:underline hover:underline-offset-2"
-                  >
+                  <Link to={`/research/projects/${r.id}`} className="block truncate text-center hover:underline hover:underline-offset-2">
                     {r.title}
                   </Link>
                 </div>
-
-                <div className="px-3 text-center whitespace-pre-line">
-                  {r.period}
+                <div className="px-3 text-center text-[12px] text-black/70">
+                  {formatDate(r.startDate)} ~ {r.endDate ? formatDate(r.endDate) : "진행중"}
                 </div>
               </div>
             ))
@@ -125,39 +124,23 @@ export default function ProjectsView() {
         </div>
       </div>
 
-      {/* ✅ 하단 검색 */}
-      <div className="mt-14 flex justify-center">
+      {!loading && !error && data.totalPages > 1 && (
+        <div className="mt-10"><Pagination page={data.page} totalPages={data.totalPages} onChange={setPage} /></div>
+      )}
+
+      <form onSubmit={submitSearch} className="mt-14 flex justify-center">
         <div className="w-full max-w-[520px] flex items-center gap-6">
           <div className="relative">
-            <select
-              value={field}
-              onChange={(e) => setField(e.target.value)}
-              className="h-[38px] rounded-full border border-black/40 bg-white px-4 pr-10 text-[13px] font-semibold text-black"
-            >
-              {FIELDS.map((f) => (
-                <option key={f} value={f}>
-                  {f}
-                </option>
-              ))}
+            <select value={field} onChange={(e) => setField(e.target.value)} className="h-[38px] rounded-full border border-black/40 bg-white px-4 pr-10 text-[13px] font-semibold text-black">
+              {FIELDS.map((f) => <option key={f} value={f}>{f}</option>)}
             </select>
           </div>
-
           <div className="flex-1 border-b border-black/40 flex items-center">
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              className="h-[42px] w-full bg-transparent outline-none text-[14px] text-black"
-            />
-            <button
-              type="button"
-              aria-label="Search"
-              className="px-2 text-black/70"
-            >
-              🔍
-            </button>
+            <input value={qInput} onChange={(e) => setQInput(e.target.value)} placeholder="검색어를 입력하세요" className="h-[42px] w-full bg-transparent outline-none text-[14px] text-black" />
+            <button type="submit" aria-label="Search" className="px-2 text-black/70">🔍</button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

@@ -35,7 +35,7 @@ export default function ResearchPage() {
         }}
       >
         <div className="research-scope"></div>
-        <div className="h-[96px]" />
+        <div className="h-[88px]" />
 
         <div data-theme="light">
           {/* ✅ 탭(라우팅됨) */}

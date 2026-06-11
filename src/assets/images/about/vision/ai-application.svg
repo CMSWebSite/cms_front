@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 600" role="img" aria-label="AI 응용 기술 개발 일러스트레이션">
+  <defs>
+    <linearGradient id="c2bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#081226"/>
+      <stop offset=".5" stop-color="#11316d"/>
+      <stop offset="1" stop-color="#060d20"/>
+    </linearGradient>
+    <radialGradient id="c2glow" cx="50%" cy="45%" r="55%">
+      <stop offset="0" stop-color="#5cc6ff" stop-opacity=".55"/>
+      <stop offset=".6" stop-color="#2f86d6" stop-opacity=".13"/>
+      <stop offset="1" stop-color="#2f86d6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="c2screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#103063"/>
+      <stop offset="1" stop-color="#071a38"/>
+    </linearGradient>
+    <linearGradient id="c2hand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a467f"/>
+      <stop offset="1" stop-color="#0a1c3c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1100" height="600" fill="url(#c2bg)"/>
+  <ellipse cx="550" cy="265" rx="450" ry="300" fill="url(#c2glow)"/>
+
+  <g stroke="#4f9fdc" stroke-width="1.8" opacity=".5" fill="none" stroke-linecap="round">
+    <path d="M250 138L372 222"/>
+    <path d="M250 138L148 298"/>
+    <path d="M852 128L728 222"/>
+    <path d="M852 128L956 300"/>
+    <path d="M196 430L362 356"/>
+    <path d="M906 432L738 356"/>
+  </g>
+  <g fill="#7fd6ff">
+    <circle cx="250" cy="138" r="7"/>
+    <circle cx="148" cy="298" r="5"/>
+    <circle cx="852" cy="128" r="7"/>
+    <circle cx="956" cy="300" r="5"/>
+    <circle cx="196" cy="430" r="6"/>
+    <circle cx="906" cy="432" r="6"/>
+  </g>
+
+  <path d="M412 600L400 472Q400 440 545 440Q690 440 690 472L678 600Z" fill="url(#c2hand)" stroke="#5fb8ff" stroke-width="2.5"/>
+  <g stroke="#5fb8ff" stroke-width="1.3" fill="none" opacity=".45">
+    <path d="M400 472L545 512L690 472"/>
+    <path d="M545 440L545 512L468 600"/>
+    <path d="M545 512L622 600"/>
+  </g>
+
+  <rect x="344" y="126" width="412" height="306" rx="34" fill="#3aa0e8" opacity=".16"/>
+  <rect x="372" y="150" width="356" height="262" rx="24" fill="#0b2245" stroke="#64bdff" stroke-width="3"/>
+  <rect x="392" y="170" width="316" height="222" rx="14" fill="url(#c2screen)"/>
+
+  <rect x="412" y="190" width="150" height="15" rx="7.5" fill="#3f9fe0" opacity=".85"/>
+  <circle cx="688" cy="198" r="9" fill="none" stroke="#64bdff" stroke-width="2.5"/>
+  <path d="M683 198L687 202L694 194" stroke="#64bdff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <path d="M414 322L460 290L506 305L552 258L598 276L644 238L688 256V348H414Z" fill="#5cc6ff" opacity=".14"/>
+  <polyline points="414,322 460,290 506,305 552,258 598,276 644,238 688,256" fill="none" stroke="#6cd0ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#bfe9ff">
+    <circle cx="460" cy="290" r="4.5"/>
+    <circle cx="552" cy="258" r="4.5"/>
+    <circle cx="644" cy="238" r="4.5"/>
+  </g>
+  <g fill="#3f9fe0" opacity=".8">
+    <rect x="416" y="356" width="58" height="12" rx="6"/>
+    <rect x="486" y="356" width="86" height="12" rx="6"/>
+    <rect x="584" y="356" width="44" height="12" rx="6"/>
+  </g>
+
+  <g fill="url(#c2hand)" stroke="#5fb8ff" stroke-width="2.5">
+    <rect x="412" y="388" width="44" height="86" rx="22"/>
+    <rect x="468" y="380" width="44" height="94" rx="22"/>
+    <rect x="524" y="380" width="44" height="94" rx="22"/>
+    <rect x="580" y="388" width="44" height="86" rx="22"/>
+  </g>
+  <rect x="332" y="402" width="42" height="88" rx="21" fill="url(#c2hand)" stroke="#5fb8ff" stroke-width="2.5" transform="rotate(-32 353 446)"/>
+  <g fill="#9adcff">
+    <circle cx="434" cy="400" r="5"/>
+    <circle cx="490" cy="392" r="5"/>
+    <circle cx="546" cy="392" r="5"/>
+    <circle cx="602" cy="400" r="5"/>
+  </g>
+</svg>

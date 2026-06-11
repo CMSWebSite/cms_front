@@ -1,18 +1,24 @@
-import etri from "../../assets/icons/partner-etri.png";
-import kmou from "../../assets/icons/partner-kmou.png";
-import sinacota from "../../assets/icons/partner-sinacota.png";
-
-const partners = [
-  { name: "ETRI", logo: etri },
-  { name: "KMOU", logo: kmou },
-  { name: "SINACOTA", logo: sinacota },
-];
+import { useEffect, useState } from "react";
+import { publicPartnersApi } from "../../api/public/partners";
 
 export default function PartnersSection() {
+  const [partners, setPartners] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    publicPartnersApi.list()
+      .then((d) => mounted && setPartners(Array.isArray(d) ? d : []))
+      .catch(() => mounted && setPartners([]))
+      .finally(() => mounted && setLoading(false));
+    return () => { mounted = false; };
+  }, []);
+
+  if (!loading && partners.length === 0) return null;
+
   return (
     <section className="w-full bg-[#0D0D0D] pt-20 pb-32 mb-24">
       <div className="mx-auto max-w-[1200px] px-6">
-        {/* Title */}
         <h2
           className="mb-16 inline-block"
           style={{
@@ -29,36 +35,42 @@ export default function PartnersSection() {
         >
           Our partners
         </h2>
-        {/* Logos row */}
-        <div className="flex items-center gap-20">
-          {partners.map((p) => (
-            <div
-              key={p.name}
-              style={{
-                width: 239,
-                height: 66,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
+
+        <div className="flex flex-wrap items-center gap-20">
+          {partners.map((p) => {
+            const logo = p.logoUrl ? (
               <img
-                src={p.logo}
+                src={p.logoUrl}
                 alt={p.name}
                 draggable={false}
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                  objectFit: "contain",
-                  transform: p.name === "SINACOTA" ? "scale(1.4)" : "none",
-                  filter:
-                    p.name === "SINACOTA"
-                      ? "brightness(0) invert(1)"
-                      : "none",
-                }}
+                style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
               />
-            </div>
-          ))}
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-[14px] text-white/60">
+                {p.name}
+              </div>
+            );
+            const container = (
+              <div
+                style={{
+                  width: 239,
+                  height: 66,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {logo}
+              </div>
+            );
+            return p.websiteUrl ? (
+              <a key={p.id} href={p.websiteUrl} target="_blank" rel="noreferrer">
+                {container}
+              </a>
+            ) : (
+              <div key={p.id}>{container}</div>
+            );
+          })}
         </div>
       </div>
     </section>

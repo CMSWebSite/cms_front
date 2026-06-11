@@ -1,131 +1,106 @@
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 import ResearchTabs from "../components/research/ResearchTabs";
+import LoadingState from "../components/common/LoadingState";
+import ErrorState from "../components/common/ErrorState";
+import { publicProjectsApi } from "../api/public/projects";
+import { ApiError } from "../api/client";
 
-// ✅ 더미 데이터 (나중에 실제 데이터로 교체)
-const PROJECTS = [
-  {
-    id: "1",
-    title:
-      "[KMOU BRIDGE 3.0 융복합 공동기술사업화] 소형 선박용 영상분석 기반 이상행동 탐지 기술 개발",
-    date: "2025-06-11",
-    sponsor: "ETRI",
-    image: "/src/assets/images/research-1.jpg", // ✅ 임시 이미지(원하는 걸로 교체)
-    body: [
-      "Deep learning techniques have led to remarkable breakthroughs in the field of object detection and have spawned a lot of scene-understanding tasks in recent years. Scene graph has been the focus of research because of its powerful semantic representation and applications to scene understanding.",
-      "Scene Graph Generation (SGG) refers to the task of automatically mapping an image or a video into a semantic structural scene graph, which requires the correct labeling of detected objects and their relationships.",
-      "In this paper, a comprehensive survey of recent achievements is provided. This survey attempts to connect and systematize the existing visual relationship detection methods, to summarize, and interpret the mechanisms and the strategies of SGG in a comprehensive way. Deep discussions about current existing problems and future research directions are given at last. This survey will help readers to develop a better understanding of the current research.",
-    ],
-  },
-  {
-    id: "2",
-    title:
-      "[재난안전 공동연구 기술개발사업] 생성형 AI 기반 안전제도 진단 지원시스템 개발",
-    date: "2025-07-18",
-    sponsor: "—",
-    image: "/src/assets/images/research-2.jpg",
-    body: ["(내용은 추후 입력)"],
-  },
-];
-
-function Divider() {
-  return <div className="h-px w-full bg-black/20" />;
-}
+const STATUS_LABEL = {
+  PLANNED: "계획",
+  ONGOING: "수행 중",
+  COMPLETED: "수행 완료",
+  SUSPENDED: "보류",
+};
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams();
+  const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [error, setError] = useState(null);
 
-  const project = useMemo(
-    () => PROJECTS.find((p) => p.id === projectId),
-    [projectId]
-  );
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true); setNotFound(false); setError(null);
+    publicProjectsApi.get(projectId)
+      .then((d) => mounted && setProject(d))
+      .catch((err) => {
+        if (!mounted) return;
+        if (err instanceof ApiError && err.status === 404) setNotFound(true);
+        else setError(err instanceof ApiError ? err.message : "불러오지 못했습니다.");
+      })
+      .finally(() => mounted && setLoading(false));
+    return () => { mounted = false; };
+  }, [projectId]);
 
   return (
     <div className="min-h-screen bg-bg">
       <Header />
-
-      <main
-        className="relative z-0 bg-white"
-        style={{ backgroundColor: "#fff", color: "rgba(0,0,0,0.88)" }}
-      >
-        <div className="h-[96px]" />
-
+      <main className="relative z-0 bg-white" style={{ backgroundColor: "#fff", color: "rgba(0,0,0,0.88)" }}>
+        <div className="h-[88px]" />
         <div data-theme="light" className="text-black">
-          {/* 상단 Research 탭 유지(스샷처럼) */}
           <ResearchTabs />
-
           <section className="w-full bg-white">
             <div className="mx-auto max-w-container px-6 pb-24">
-              {/* breadcrumb */}
-              <div className="pt-6 text-[13px] text-black/70 font-medium">
+              <div className="pt-6 text-[14px] text-black/70 font-medium">
                 <span className="mr-2">⌂</span>
-                <Link to="/research" className="hover:underline">
-                  Research
-                </Link>
+                <Link to="/research" className="hover:underline">Research</Link>
                 <span className="mx-2">&gt;</span>
-                <Link to="/research/projects" className="hover:underline">
-                  Projects
-                </Link>
+                <Link to="/research/projects" className="hover:underline">Projects</Link>
               </div>
+              <h1 className="mt-10 text-center text-[56px] font-extrabold tracking-[-0.02em] text-black">Projects</h1>
 
-              {/* center title */}
-              <h1 className="mt-10 text-center text-[56px] font-extrabold tracking-[-0.02em] text-black">
-                Projects
-              </h1>
+              {loading && <LoadingState className="mt-16" />}
+              {!loading && error && <ErrorState className="mt-16" message={error} />}
+              {!loading && notFound && <div className="mt-16 text-center text-black/60">프로젝트를 찾을 수 없습니다.</div>}
 
-              {!project ? (
-                <div className="mt-16 text-center text-black/60">
-                  내용을 찾을 수 없습니다.
-                </div>
-              ) : (
-                <div className="mx-auto mt-12 max-w-[860px]">
-                  {/* title */}
-                  <h2 className="text-[22px] font-extrabold leading-[36px] text-black">
-                    {project.title}
-                  </h2>
-
-                  {/* date */}
-                  <div className="mt-2 text-[12px] text-black/50">
-                    {project.date}
-                  </div>
-
-                  {/* sponsor */}
-                  <div className="mt-2 text-[12px] text-black/70">
-                    지원 기관: {project.sponsor}
-                  </div>
-
-                  {/* image */}
-                  <div className="mt-8 flex justify-center">
-                    <div className="w-[520px]">
-                      <img
-                        src={project.image}
-                        alt=""
-                        draggable={false}
-                        className="w-full h-auto object-cover"
-                      />
+              {!loading && !error && project && (
+                <>
+                  <div className="mt-12 max-w-[860px]">
+                    <div className="mb-3 inline-flex h-6 items-center rounded-full bg-black/[0.06] px-3 text-[12px] font-semibold text-black/70">
+                      {STATUS_LABEL[project.status] ?? project.status}
                     </div>
+                    <h2 className="text-[22px] font-extrabold leading-[34px] text-black">{project.title}</h2>
+                    <div className="mt-2 text-[12px] text-black/50">
+                      {project.startDate} ~ {project.endDate || "진행중"}
+                    </div>
+
+                    <ul className="mt-6 space-y-2 text-[13px] text-black/80">
+                      {project.fundingAgency && <li className="flex gap-2"><span className="mt-[7px] h-[3px] w-[3px] rounded-full bg-black/70" /><span>발주기관: {project.fundingAgency}</span></li>}
+                      {project.role && <li className="flex gap-2"><span className="mt-[7px] h-[3px] w-[3px] rounded-full bg-black/70" /><span>역할: {project.role}</span></li>}
+                    </ul>
                   </div>
 
-                  {/* body text */}
-                  <div className="mt-10 space-y-4 text-[13px] leading-[22px] text-black/80">
-                    {project.body.map((p, idx) => (
-                      <p key={idx}>{p}</p>
-                    ))}
-                  </div>
+                  {project.thumbnailImage && (
+                    <div className="mt-10 max-w-[860px]">
+                      <img src={project.thumbnailImage} alt={project.title} className="w-full rounded-md border border-black/10 object-cover" />
+                    </div>
+                  )}
 
-                  {/* bottom divider (스샷처럼) */}
-                  <div className="mt-12">
-                    <Divider />
-                  </div>
-                </div>
+                  {project.description && (
+                    <div className="mt-10 max-w-[860px]">
+                      <div className="text-[14px] font-extrabold italic text-black">요약</div>
+                      <p className="mt-3 text-[13px] leading-[22px] text-black/80 whitespace-pre-line">{project.description}</p>
+                    </div>
+                  )}
+
+                  {project.detailContent && (
+                    <div className="mt-10 max-w-[860px]">
+                      <div className="text-[14px] font-extrabold italic text-black">상세 내용</div>
+                      <p className="mt-3 text-[13px] leading-[22px] text-black/80 whitespace-pre-line">{project.detailContent}</p>
+                    </div>
+                  )}
+
+                  <div className="mt-10 h-px w-full bg-black/20" />
+                </>
               )}
             </div>
           </section>
         </div>
       </main>
-
       <Footer />
     </div>
   );
