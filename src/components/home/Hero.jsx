@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
-import heroImgFallback from "../../assets/images/hero.gif";
+import heroVideoFallback from "../../assets/images/hero.mp4";
 import { publicSiteSettingsApi } from "../../api/public/siteSettings";
+
+// 관리자 설정(homepage.hero.image)이 영상 URL이면 <video>, 아니면 <img>로 렌더링한다.
+const isVideoUrl = (src) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(src || "");
 
 const DEFAULT_SUBTITLE =
   "Our lab focuses on engineering intelligence,\nmoving beyond isolated models toward real-world systems.";
@@ -16,7 +19,7 @@ export default function Hero() {
     return () => { mounted = false; };
   }, []);
 
-  const heroImg = settings?.["homepage.hero.image"] || heroImgFallback;
+  const heroSrc = settings?.["homepage.hero.image"] || heroVideoFallback;
   const subtitle = settings?.["homepage.hero.subtitle"] || DEFAULT_SUBTITLE;
 
   return (
@@ -25,12 +28,24 @@ export default function Hero() {
 
       <div className="flex justify-center">
         <div className="relative w-[1119px] h-[746px]">
-          <img
-            src={heroImg}
-            alt=""
-            draggable="false"
-            className="w-full h-full object-cover"
-          />
+          {isVideoUrl(heroSrc) ? (
+            <video
+              src={heroSrc}
+              autoPlay
+              muted
+              loop
+              playsInline
+              aria-hidden="true"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <img
+              src={heroSrc}
+              alt=""
+              draggable="false"
+              className="w-full h-full object-cover"
+            />
+          )}
           <div
             className="pointer-events-none absolute inset-0"
             style={{

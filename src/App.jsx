@@ -23,6 +23,7 @@ import QnaDetailPage from "./pages/community/QnaDetailPage";
 import QnaWritePage from "./pages/community/QnaWritePage";
 import LoginPage from "./pages/login/LoginPage";
 import SignupPage from "./pages/signup/SignupPage";
+import NotFoundPage from "./pages/NotFoundPage";
 import RequireAdmin from "./auth/RequireAdmin";
 import AdminLayout from "./pages/admin/AdminLayout";
 import DashboardPage from "./pages/admin/DashboardPage";
@@ -47,6 +48,7 @@ import GalleryListPage from "./pages/admin/gallery/GalleryListPage";
 import GalleryEditPage from "./pages/admin/gallery/GalleryEditPage";
 import QnaListPage from "./pages/admin/qna/QnaListPage";
 import QnaEditPage from "./pages/admin/qna/QnaEditPage";
+import ContactListPage from "./pages/admin/contact/ContactListPage";
 import PartnersListPage from "./pages/admin/partners/PartnersListPage";
 import PartnerEditPage from "./pages/admin/partners/PartnerEditPage";
 import SiteSettingsPage from "./pages/admin/siteSettings/SiteSettingsPage";
@@ -150,6 +152,7 @@ export default function App() {
           <Route path="gallery/:id" element={<GalleryEditPage />} />
           <Route path="qna" element={<QnaListPage />} />
           <Route path="qna/:id" element={<QnaEditPage />} />
+          <Route path="contact-applications" element={<ContactListPage />} />
           <Route path="partners" element={<PartnersListPage />} />
           <Route path="partners/:id" element={<PartnerEditPage />} />
           <Route path="site-settings" element={<SiteSettingsPage />} />
@@ -157,6 +160,9 @@ export default function App() {
           <Route path="students/:id" element={<StudentEditPage />} />
           <Route path="users" element={<UsersListPage />} />
         </Route>
+
+        {/* 정의되지 않은 경로 → 404 */}
+        <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

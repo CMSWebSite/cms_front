@@ -1,12 +1,89 @@
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 import ResearchTabs from "../components/research/ResearchTabs";
 import AchievementsView from "../components/research/AchievementsView";
 import ProjectsView from "../components/research/ProjectsView";
+import { publicSiteSettingsApi } from "../api/public/siteSettings";
+import research1 from "../assets/images/research-1.jpg";
+import research2 from "../assets/images/research-2.jpg";
+
+// Research topics 본문은 관리자 > Site Settings 에서 관리한다.
+// - research.intro                      : 상단 소개 문단 (빈 줄로 문단 구분)
+// - homepage.research.cardN.title/image : 홈 Research 카드와 공유
+// - homepage.research.cardN.description : 각 연구 주제 설명 (빈 값이면 제목·이미지만 표시)
+const DEFAULT_INTRO = "사이버마린 시스템 연구실의 주요 연구 분야를 소개합니다.";
+const DEFAULT_TOPICS = [
+  { title: "Innovative Battlefield Solutions\nEnabled by Artificial Intelligence", image: research1, description: "" },
+  { title: "Development of Standardized\nDocumentation", image: research2, description: "" },
+  { title: "Smart Ship and\nMarine Cybersecurity", image: "", description: "" },
+];
+
+function TopicSection({ topic, index }) {
+  const imageFirst = index % 2 === 1;
+  const image = topic.image ? (
+    <img
+      src={topic.image}
+      alt=""
+      className="w-full h-[280px] object-cover"
+      draggable="false"
+    />
+  ) : (
+    <div className="w-full h-[280px] bg-gradient-to-br from-[#1a2030] to-[#0a0e16]" />
+  );
+
+  return (
+    <section className="mt-16 grid grid-cols-12 gap-10 items-center">
+      <div className={imageFirst ? "col-span-7 order-1" : "col-span-5"}>
+        {imageFirst ? image : (
+          <h2 className="whitespace-pre-line text-[26px] font-extrabold leading-[34px] text-black">
+            {topic.title}
+          </h2>
+        )}
+      </div>
+      <div className={imageFirst ? "col-span-5 order-2" : "col-span-7"}>
+        {imageFirst ? (
+          <h2 className="whitespace-pre-line text-[26px] font-extrabold leading-[34px] text-black">
+            {topic.title}
+          </h2>
+        ) : image}
+      </div>
+      {topic.description && (
+        <div className="col-span-12 order-3 whitespace-pre-line text-[16px] leading-[28px] text-black/80 max-w-[900px]">
+          {topic.description}
+        </div>
+      )}
+    </section>
+  );
+}
 
 export default function ResearchPage() {
   const { pathname } = useLocation();
+  const [intro, setIntro] = useState(DEFAULT_INTRO);
+  const [topics, setTopics] = useState(DEFAULT_TOPICS);
+
+  useEffect(() => {
+    if (pathname !== "/research") return undefined;
+    let mounted = true;
+    publicSiteSettingsApi
+      .all()
+      .then((s) => {
+        if (!mounted || !s) return;
+        if (s["research.intro"]?.trim()) setIntro(s["research.intro"]);
+        setTopics(
+          [1, 2, 3].map((i) => ({
+            title: s[`homepage.research.card${i}.title`] || DEFAULT_TOPICS[i - 1].title,
+            image: s[`homepage.research.card${i}.image`] || DEFAULT_TOPICS[i - 1].image,
+            description: s[`homepage.research.card${i}.description`] || "",
+          }))
+        );
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, [pathname]);
 
   const pageTitle =
     pathname === "/research/achievements"
@@ -26,112 +103,60 @@ export default function ResearchPage() {
     <div className="min-h-screen bg-bg">
       <Header />
 
-      {/* ✅ main부터 라이트 */}
       <main
         className="relative z-0 bg-white"
         style={{
           backgroundColor: "#fff",
-          color: "rgba(0,0,0,0.88)", // 기본 텍스트 색 강제
+          color: "rgba(0,0,0,0.88)",
         }}
       >
         <div className="research-scope"></div>
         <div className="h-[88px]" />
 
         <div data-theme="light">
-          {/* ✅ 탭(라우팅됨) */}
           <ResearchTabs />
 
-          {/* ✅ 본문 */}
           <section className="w-full bg-white">
             <div className="mx-auto max-w-container px-6 pb-24">
-              {/* breadcrumb */}
               <div className="pt-6 text-[14px] text-black/70 font-medium">
                 {breadcrumb}
               </div>
 
-              {/* title */}
               <h1 className="mt-12 text-center text-[64px] font-extrabold tracking-[-0.02em] text-black">
                 {pageTitle}
               </h1>
 
-              {/* intro: topics에서만 보여주고, 나머지는 placeholder */}
               {pathname === "/research" && (
-                <div className="mt-12 max-w-[900px]">
-                  <p className="text-[18px] leading-[32px] text-black/90 font-semibold">
-                    우리는 지구를 보호하고 인류의 삶의 질을 향상시키며, 미래의
-                    지속가능한 성장을 위한 핵심 기술 개발에 집중합니다.
-                  </p>
-                  <p className="mt-6 text-[18px] leading-[32px] text-black/80">
-                    We focus on protecting the planet, improving the quality of
-                    life for mankind, and developing core technologies for
-                    sustainable growth in the future.
-                  </p>
-                </div>
+                <>
+                  <div className="mt-12 max-w-[900px] space-y-6">
+                    {intro
+                      .split(/\n\s*\n/)
+                      .filter((p) => p.trim())
+                      .map((p, i) => (
+                        <p
+                          key={i}
+                          className={
+                            i === 0
+                              ? "whitespace-pre-line text-[18px] leading-[32px] text-black/90 font-semibold"
+                              : "whitespace-pre-line text-[18px] leading-[32px] text-black/80"
+                          }
+                        >
+                          {p.trim()}
+                        </p>
+                      ))}
+                  </div>
+
+                  <hr className="mt-16 border-black/20" />
+
+                  {topics.map((t, i) => (
+                    <TopicSection key={i} topic={t} index={i} />
+                  ))}
+                </>
               )}
 
               {pathname === "/research/achievements" && <AchievementsView />}
 
               {pathname === "/research/projects" && <ProjectsView />}
-
-              {pathname === "/research/projects" && (
-                <div className="mt-12 max-w-[900px] text-[18px] leading-[32px] text-black/80">
-                  Content for <b>{pageTitle}</b> will be placed here.
-                </div>
-              )}
-
-              <hr className="mt-16 border-black/20" />
-
-              {/* ✅ topics일 때만 기존 섹션 유지 */}
-              {pathname === "/research" && (
-                <>
-                  {/* section 1 */}
-                  <section className="mt-16 grid grid-cols-12 gap-10 items-center">
-                    <div className="col-span-5">
-                      <h2 className="text-[26px] font-extrabold leading-[34px] text-black">
-                        Innovative Battlefield
-                        <br />
-                        Solutions Enabled by
-                        <br />
-                        Artificial Intelligence
-                      </h2>
-                    </div>
-
-                    <div className="col-span-7">
-                      <img
-                        src="/src/assets/images/research-1.jpg"
-                        alt=""
-                        className="w-full h-[280px] object-cover"
-                        draggable="false"
-                      />
-                    </div>
-                  </section>
-
-                  {/* section 2 */}
-                  <section className="mt-14 grid grid-cols-12 gap-10 items-start">
-                    <div className="col-span-7">
-                      <img
-                        src="/src/assets/images/research-2.jpg"
-                        alt=""
-                        className="w-full h-[280px] object-cover"
-                        draggable="false"
-                      />
-                    </div>
-
-                    <div className="col-span-5 text-[16px] leading-[28px] text-black/80 space-y-6">
-                      <p>
-                        인구과잉, 자원고갈, 에너지문제
-                        <br />
-                        인류와 지구가 당면한 문제 해결을 위해 민간이 우주 자원
-                        개발에 나서는 뉴스페이스 시대가 다가오고 있습니다.
-                      </p>
-                      <p>
-                        우주에 있는 무한한 에너지와 광물자원, 우리는 인류, 지구,
-                        미래를 위해 활용할 수 있는 방법을 찾아가고 있습니다.
-                      </p>
-                    </div>
-                  </section>
-                </>
-              )}
             </div>
           </section>
         </div>
