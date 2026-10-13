@@ -29,6 +29,18 @@ body {
   }
 }
 
+/* Sticky footer: page wrappers become full-height flex columns so the
+   footer is pushed to the bottom even when page content is short. */
+#root > div:has(> footer) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#root > div:has(> footer) > footer {
+  margin-top: auto;
+}
+
 /* legacy: page-local light scope (prefer html[data-theme="light"]) */
 .page-light {
   background: var(--color-bg);

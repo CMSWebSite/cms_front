@@ -59,6 +59,9 @@ export default function OthersDetailPage() {
                       {paper.type}
                     </div>
                     <h2 className="text-[22px] font-extrabold leading-[34px] text-black">{paper.title}</h2>
+                    {paper.authors && (
+                      <div className="mt-2 text-[13px] text-black/70">{paper.authors}</div>
+                    )}
                     <div className="mt-2 text-[12px] text-black/50">{paper.achievedOn}</div>
                   </div>
 

@@ -12,7 +12,7 @@ const TYPE_OPTIONS = ["저작권", "기술이전", "기타"];
 const todayIso = () => new Date().toISOString().slice(0, 10);
 
 const EMPTY = {
-  title: "", type: "저작권", description: "",
+  title: "", type: "저작권", description: "", authors: "",
   achievedOn: todayIso(),
   attachmentName: "", attachmentUrl: "", attachmentSize: 0,
   visible: true,
@@ -35,6 +35,7 @@ export default function OtherEditPage() {
     othersApi.get(id)
       .then((d) => setForm({
         title: d.title, type: d.type, description: d.description ?? "",
+        authors: d.authors ?? "",
         achievedOn: d.achievedOn,
         attachmentName: d.attachmentName ?? "",
         attachmentUrl: d.attachmentUrl ?? "",
@@ -53,6 +54,7 @@ export default function OtherEditPage() {
     const payload = {
       title: form.title, type: form.type,
       description: form.description || null,
+      authors: form.authors || null,
       achievedOn: form.achievedOn,
       attachmentName: form.attachmentName || null,
       attachmentUrl: form.attachmentUrl || null,
@@ -100,6 +102,9 @@ export default function OtherEditPage() {
                 <input type="date" value={form.achievedOn} onChange={(e) => update({ achievedOn: e.target.value })} className={inputClass} required />
               </FormField>
             </div>
+            <FormField label="저자" hint="선택 (쉼표로 구분)" error={fieldErrors.authors}>
+              <input type="text" value={form.authors} onChange={(e) => update({ authors: e.target.value })} className={inputClass} maxLength={1000} placeholder="예: 홍길동, 김철수" />
+            </FormField>
             <FormField label="설명">
               <textarea value={form.description} onChange={(e) => update({ description: e.target.value })} className={`${textareaClass} min-h-[180px]`} />
             </FormField>
