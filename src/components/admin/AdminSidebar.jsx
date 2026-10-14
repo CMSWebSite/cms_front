@@ -15,6 +15,7 @@ const items = [
   { to: "/admin/vision-mission", label: "Vision & Mission" },
   { to: "/admin/gallery", label: "Gallery" },
   { to: "/admin/qna", label: "Q&A" },
+  { to: "/admin/contact-applications", label: "Contact us" },
   { to: "/admin/partners", label: "Partners" },
   { to: "/admin/site-settings", label: "Site Settings" },
   { to: "/admin/users", label: "Users" },
@@ -58,6 +59,13 @@ export default function AdminSidebar({ onLogout }) {
       </nav>
 
       <div className="px-3 pb-6">
+        <NavLink
+          to="/"
+          className="mb-2 flex w-full items-center justify-center gap-2 rounded-md border border-white/20 px-3 py-2 text-[13px] font-semibold text-white hover:bg-white/10"
+        >
+          <span aria-hidden="true">↗</span>
+          유저 페이지로 이동
+        </NavLink>
         <button
           type="button"
           onClick={onLogout}
@@ -65,12 +73,6 @@ export default function AdminSidebar({ onLogout }) {
         >
           로그아웃
         </button>
-        <div className="mt-3 px-3 text-[11px] text-white/40">
-          홈으로 돌아가려면{" "}
-          <NavLink to="/" className="underline hover:text-white/70">
-            사이트
-          </NavLink>
-        </div>
       </div>
     </aside>
   );

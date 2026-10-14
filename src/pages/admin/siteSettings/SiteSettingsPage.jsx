@@ -22,7 +22,7 @@ const GROUPS = [
   {
     title: "Homepage — Hero",
     fields: [
-      { key: "homepage.hero.image", label: "Hero 이미지/GIF URL", type: "text" },
+      { key: "homepage.hero.image", label: "Hero 영상/이미지 URL", type: "text", hint: "mp4·webm 영상 또는 이미지 URL. 비우면 기본 영상 사용" },
       { key: "homepage.hero.subtitle", label: "Hero 캡션", type: "textarea", hint: "줄바꿈으로 두 줄 분리" },
     ],
   },
@@ -31,19 +31,30 @@ const GROUPS = [
     fields: [
       { key: "homepage.research.card1.title", label: "카드 1 제목", type: "textarea", rows: 2 },
       { key: "homepage.research.card1.image", label: "카드 1 이미지 URL", type: "text" },
+      { key: "homepage.research.card1.description", label: "카드 1 설명", type: "textarea", hint: "Research topics 페이지에 표시. 비우면 제목·이미지만 표시" },
       { key: "homepage.research.card2.title", label: "카드 2 제목", type: "textarea", rows: 2 },
       { key: "homepage.research.card2.image", label: "카드 2 이미지 URL", type: "text" },
+      { key: "homepage.research.card2.description", label: "카드 2 설명", type: "textarea", hint: "Research topics 페이지에 표시. 비우면 제목·이미지만 표시" },
       { key: "homepage.research.card3.title", label: "카드 3 제목", type: "textarea", rows: 2 },
       { key: "homepage.research.card3.image", label: "카드 3 이미지 URL", type: "text" },
+      { key: "homepage.research.card3.description", label: "카드 3 설명", type: "textarea", hint: "Research topics 페이지에 표시. 비우면 제목·이미지만 표시" },
+    ],
+  },
+  {
+    title: "Research topics",
+    fields: [
+      { key: "research.intro", label: "소개 문단", type: "textarea", rows: 4, hint: "빈 줄로 문단을 구분. 첫 문단은 강조 표시" },
     ],
   },
   {
     title: "Footer",
     fields: [
-      { key: "footer.phone", label: "전화번호", type: "text" },
-      { key: "footer.fax", label: "FAX", type: "text" },
+      { key: "footer.affiliation", label: "연구실 / 소속", type: "text" },
       { key: "footer.address", label: "주소", type: "textarea" },
-      { key: "footer.copyright", label: "Copyright", type: "text" },
+      { key: "footer.email", label: "대표 이메일", type: "text", hint: "비우면 표시하지 않음" },
+      { key: "footer.phone", label: "전화번호", type: "text", hint: "비우면 표시하지 않음" },
+      { key: "footer.fax", label: "FAX", type: "text", hint: "비우면 표시하지 않음" },
+      { key: "footer.copyright", label: "Copyright", type: "text", hint: "{year}는 현재 연도로 자동 치환" },
     ],
   },
   {

@@ -75,40 +75,8 @@ export default function RecentNewsPage() {
         </section>
 
         <section className="mx-auto max-w-[1280px] px-12 pt-[42px] pb-[140px]">
-          <div className="mb-[56px] flex items-center gap-1 text-[14px] text-black">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="shrink-0"
-            >
-              <path
-                d="M3 10.5L12 3L21 10.5"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M5 9.5V20H19V9.5"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M9 20V14H15V20"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span>Community</span>
-            <span>{">"}</span>
-            <span>Recent news</span>
+          <div className="mb-[40px] text-[14px] text-black">
+            ⌂ Community &gt; Recent news
           </div>
 
           <h1 className="mb-[70px] text-center text-[64px] font-bold leading-none text-black">

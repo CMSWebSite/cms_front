@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/icons/logo.png";
 import { useAuth } from "../../auth/authContext";
+import { searchPages, searchContent } from "../../data/siteSearch";
 
 const TEXT = "rgba(255,255,255,0.98)";
 const TEXT_NAV = "rgba(255,255,255,0.92)";
@@ -70,39 +71,69 @@ const IconButton = ({ label, children, onClick, ariaExpanded, active }) => (
   </button>
 );
 
-const AccountIcon = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M12 12.5C14.2091 12.5 16 10.7091 16 8.5C16 6.29086 14.2091 4.5 12 4.5C9.79086 4.5 8 6.29086 8 8.5C8 10.7091 9.79086 12.5 12 12.5Z"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    />
-    <path
-      d="M5 20C5 16.6863 8.13401 14 12 14C15.866 14 19 16.6863 19 20"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
-function HeaderSearchPanel({ query, setQuery, showResults }) {
+function HeaderSearchPanel({ query, setQuery, onSelect }) {
   const inputRef = useRef(null);
-  const mockResults = useMemo(
-    () => ["검색결과", "연구실신청", "topic", "갤러리"],
-    []
-  );
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [active, setActive] = useState(0);
+
+  const trimmed = query.trim();
+  const showResults = trimmed.length > 0;
 
   // preventScroll: overflow-hidden 헤더가 스크롤되어 위로 밀리는 것을 막는다.
   useEffect(() => {
     inputRef.current?.focus({ preventScroll: true });
   }, []);
+
+  // 검색어 변경 → 정적 페이지는 즉시, 동적 콘텐츠는 디바운스 후 조회.
+  useEffect(() => {
+    if (!trimmed) {
+      setResults([]);
+      setLoading(false);
+      return;
+    }
+
+    const pageResults = searchPages(trimmed);
+    setResults(pageResults);
+    setActive(0);
+    setLoading(true);
+
+    let alive = true;
+    const timer = setTimeout(() => {
+      searchContent(trimmed)
+        .then((contentResults) => {
+          if (!alive) return;
+          setResults([...pageResults, ...contentResults]);
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (alive) setLoading(false);
+        });
+    }, 300);
+
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+    };
+  }, [trimmed]);
+
+  const handleKeyDown = (e) => {
+    if (!results.length) {
+      if (e.key === "Enter") e.preventDefault();
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActive((i) => (i + 1) % results.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActive((i) => (i - 1 + results.length) % results.length);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const target = results[active] ?? results[0];
+      if (target) onSelect(target.path);
+    }
+  };
 
   return (
     <div className="w-full px-8 lg:px-12" style={baseTextStyle}>
@@ -134,6 +165,7 @@ function HeaderSearchPanel({ query, setQuery, showResults }) {
               ref={inputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder="검색어를 입력하세요."
               className="w-full bg-transparent outline-none placeholder:text-white/45"
               style={{
@@ -149,80 +181,66 @@ function HeaderSearchPanel({ query, setQuery, showResults }) {
           <div className="mt-3 h-px w-full bg-white/18" />
 
           {showResults && (
-            <div className="pt-4">
-              <div
-                className="flex flex-col gap-3"
-                style={{
-                  color: TEXT_SUB,
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 500,
-                  fontSize: "15px",
-                  lineHeight: "24px",
-                }}
-              >
-                {mockResults.map((item) => (
+            <div className="max-h-[240px] overflow-y-auto pt-3">
+              {results.length === 0 && !loading && (
+                <div
+                  className="py-3"
+                  style={{ color: TEXT_SUB, fontFamily: "Inter, sans-serif", fontSize: "15px" }}
+                >
+                  검색 결과가 없습니다.
+                </div>
+              )}
+
+              <div className="flex flex-col">
+                {results.map((item, idx) => (
                   <button
-                    key={item}
+                    key={item.key}
                     type="button"
-                    className="w-fit text-left transition-colors hover:text-white"
-                    style={{ color: TEXT_SUB }}
+                    onMouseEnter={() => setActive(idx)}
+                    onClick={() => onSelect(item.path)}
+                    className="flex items-center justify-between gap-4 rounded-lg px-3 py-2.5 text-left transition-colors"
+                    style={{
+                      background: idx === active ? "rgba(255,255,255,0.08)" : "transparent",
+                    }}
                   >
-                    {item}
+                    <span
+                      className="min-w-0 flex-1 truncate"
+                      style={{
+                        color: idx === active ? TEXT : TEXT_NAV,
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: 600,
+                        fontSize: "15px",
+                        lineHeight: "24px",
+                      }}
+                    >
+                      {item.title}
+                    </span>
+                    <span
+                      className="shrink-0"
+                      style={{
+                        color: TEXT_SUB,
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: 500,
+                        fontSize: "12px",
+                        lineHeight: "20px",
+                      }}
+                    >
+                      {item.category}
+                    </span>
                   </button>
                 ))}
               </div>
+
+              {loading && (
+                <div
+                  className="py-2"
+                  style={{ color: TEXT_SUB, fontFamily: "Inter, sans-serif", fontSize: "13px" }}
+                >
+                  검색 중…
+                </div>
+              )}
             </div>
           )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function HeaderLanguagePanel() {
-  return (
-    <div className="w-full px-8 lg:px-12" style={baseTextStyle}>
-      <div className="mx-auto max-w-[1480px]">
-        <div className="pb-5 pt-2">
-          <div className="flex items-center gap-5">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              className="shrink-0"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              />
-              <path d="M2 12H22" stroke="currentColor" strokeWidth="1.8" />
-              <path
-                d="M12 2C14.7614 4.66667 16 8 16 12C16 16 14.7614 19.3333 12 22C9.23858 19.3333 8 16 8 12C8 8 9.23858 4.66667 12 2Z"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              />
-            </svg>
-
-            {["한국어", "English"].map((lang) => (
-              <button
-                key={lang}
-                type="button"
-                className="transition-opacity hover:opacity-100"
-                style={{
-                  ...baseTextStyle,
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "16px",
-                  lineHeight: "24px",
-                }}
-              >
-                {lang}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     </div>
@@ -233,10 +251,9 @@ export default function Header() {
   const [megaOpen, setMegaOpen] = useState(false);
   const [activeKey, setActiveKey] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [languageOpen, setLanguageOpen] = useState(false);
   const [query, setQuery] = useState("");
 
-  const { isAuthenticated, user, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -255,23 +272,23 @@ export default function Header() {
 
   const closeMega = () => setMegaOpen(false);
 
-  const handleNavClick = (key) => {
+  // 호버(또는 클릭/포커스)로 해당 항목의 메가 메뉴를 펼친다. 토글이 아니라 항상 "열기".
+  const openMega = (key) => {
     setSearchOpen(false);
-    setLanguageOpen(false);
-    setMegaOpen((prevOpen) => !(prevOpen && activeKey === key));
     setActiveKey(key);
+    setMegaOpen(true);
   };
 
   const handleToggleSearch = () => {
     setMegaOpen(false);
-    setLanguageOpen(false);
     setSearchOpen((prev) => !prev);
   };
 
-  const handleToggleLanguage = () => {
-    setMegaOpen(false);
+  // 검색 결과 항목 선택 → 이동 후 검색 패널 닫기.
+  const handleSearchSelect = (path) => {
     setSearchOpen(false);
-    setLanguageOpen((prev) => !prev);
+    setQuery("");
+    navigate(path);
   };
 
   const handleLogout = () => {
@@ -284,11 +301,9 @@ export default function Header() {
     ? "h-[306px]"
     : searchOpen
       ? showSearchResults
-        ? "h-[320px]"
+        ? "h-[420px]"
         : "h-[180px]"
-      : languageOpen
-        ? "h-[156px]"
-        : "h-[88px]";
+      : "h-[88px]";
 
   return (
     <>
@@ -308,6 +323,7 @@ export default function Header() {
       )}
 
       <header
+        onMouseLeave={closeMega}
         className={`fixed left-0 right-0 top-0 z-[1000] w-full overflow-hidden transition-[height] duration-300 ease-out ${headerHeight}`}
         style={{
           color: TEXT,
@@ -362,7 +378,7 @@ export default function Header() {
                 // Home 등 하위 목록이 없는 항목 — 바로 페이지로 이동한다.
                 if (children.length === 0) {
                   return (
-                    <div key={item.key} className="relative">
+                    <div key={item.key} className="relative" onMouseEnter={closeMega}>
                       <Link
                         to={item.to}
                         onClick={closeMega}
@@ -377,12 +393,17 @@ export default function Header() {
 
                 const isActive = megaOpen && activeKey === item.key;
                 return (
-                  <div key={item.key} className="relative">
+                  <div
+                    key={item.key}
+                    className="relative"
+                    onMouseEnter={() => openMega(item.key)}
+                  >
                     <button
                       type="button"
                       aria-haspopup="true"
                       aria-expanded={megaOpen}
-                      onClick={() => handleNavClick(item.key)}
+                      onClick={() => openMega(item.key)}
+                      onFocus={() => openMega(item.key)}
                       className="relative flex items-center pb-1 transition-colors"
                       style={{ ...navLabelStyle, color: navColor }}
                     >
@@ -458,53 +479,21 @@ export default function Header() {
                 </svg>
               </IconButton>
 
-              <IconButton
-                label="Language"
-                onClick={handleToggleLanguage}
-                ariaExpanded={languageOpen}
-                active={languageOpen}
-              >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                  />
-                  <path d="M2 12H22" stroke="currentColor" strokeWidth="1.8" />
-                  <path
-                    d="M12 2C14.7614 4.66667 16 8 16 12C16 16 14.7614 19.3333 12 22C9.23858 19.3333 8 16 8 12C8 8 9.23858 4.66667 12 2Z"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                  />
-                </svg>
-              </IconButton>
-
               {isAuthenticated ? (
                 <div className="flex items-center gap-2 pl-1">
+                  {/* 로그인 후 — 사용자 이름 + Logout */}
                   <span
-                    className="grid h-10 w-10 place-items-center"
-                    style={{ color: TEXT_NAV }}
-                  >
-                    <AccountIcon />
-                  </span>
-                  <span
-                    className="max-w-[120px] truncate"
+                    className="max-w-[160px] truncate px-2"
+                    title={user?.email || ""}
                     style={{
-                      ...baseTextStyle,
+                      color: TEXT_NAV,
                       fontFamily: "Inter, sans-serif",
-                      fontWeight: 700,
-                      fontSize: "15px",
+                      fontWeight: 600,
+                      fontSize: "14px",
                       lineHeight: "20px",
                     }}
-                    title={user?.name}
                   >
-                    {user?.name}
+                    {user?.name || user?.email}
                   </span>
                   <button
                     type="button"
@@ -522,17 +511,39 @@ export default function Header() {
                   </button>
                 </div>
               ) : (
-                <Link
-                  to="/login"
-                  state={{ from: location.pathname + location.search }}
-                  aria-label="Account"
-                  title="Account"
-                  onClick={closeMega}
-                  className="grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-white/10"
-                  style={{ color: TEXT_NAV }}
-                >
-                  <AccountIcon />
-                </Link>
+                /* 로그인 전 — Sign up / Login 텍스트 버튼 */
+                <div className="flex shrink-0 items-center gap-1 pl-1">
+                  <Link
+                    to="/signup"
+                    onClick={closeMega}
+                    className="rounded-full px-3 py-1.5 transition-colors hover:bg-white/10"
+                    style={{
+                      color: TEXT_NAV,
+                      fontFamily: "Inter, sans-serif",
+                      fontWeight: 700,
+                      fontSize: "14px",
+                      lineHeight: "20px",
+                    }}
+                  >
+                    Sign up
+                  </Link>
+                  <span style={{ color: TEXT_SUB }}>/</span>
+                  <Link
+                    to="/login"
+                    state={{ from: location.pathname + location.search }}
+                    onClick={closeMega}
+                    className="rounded-full px-3 py-1.5 transition-colors hover:bg-white/10"
+                    style={{
+                      color: TEXT_NAV,
+                      fontFamily: "Inter, sans-serif",
+                      fontWeight: 700,
+                      fontSize: "14px",
+                      lineHeight: "20px",
+                    }}
+                  >
+                    Login
+                  </Link>
+                </div>
               )}
             </div>
           </div>
@@ -541,13 +552,13 @@ export default function Header() {
             <HeaderSearchPanel
               query={query}
               setQuery={setQuery}
-              showResults={showSearchResults}
+              onSelect={handleSearchSelect}
             />
           )}
 
-          {languageOpen && <HeaderLanguagePanel />}
         </div>
       </header>
+
     </>
   );
 }
